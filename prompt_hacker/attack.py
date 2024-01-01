@@ -34,7 +34,12 @@ class Hacker:
         self._jb = JailBreakGenerator()
         self._mal = MaliciousGenerator()
 
-    def _prepare_prompts(self, verbose: bool, shuffle: bool) -> product | tqdm:
+    def _prepare_prompts(
+        self,
+        sample_size: int,
+        verbose: bool,
+        shuffle: bool,
+    ) -> product | tqdm:
         # TODO: Refactor for cleaner and more interpretable
         prompts = copy(self._jb.jailbreak_prompt_list)
         questions = copy(self._mal())
@@ -43,7 +48,7 @@ class Hacker:
             random.shuffle(questions)
         iters = list(product(prompts, questions))
         total_len = int(len(prompts) * len(questions))
-        iters = tqdm(iters, total=total_len) if verbose else iters
+        iters = tqdm(iters, total=sample_size) if verbose else iters
         return iters
 
     def run(
@@ -52,13 +57,21 @@ class Hacker:
         verbose: bool = False,
         shuffle: bool = False,
     ) -> list[QAReults]:
-        iters = self._prepare_prompts(verbose, shuffle)
+        iters = self._prepare_prompts(sample_size, verbose, shuffle)
         result = []
         cnt = 0
         try:
             for prompt, question in iters:
-                query = prompt.format(query=question)
-                answer = self._model.run(query)
+                try:
+                    query = prompt.format(query=question)
+                    answer = self._model.run(query)
+                except:
+                    print(
+                        f"""there was error during model api call.
+                          prompt : {prompt}
+                          question : {question}"""
+                    )
+                    continue
                 result.append(
                     QAReults(
                         prompt=prompt,
