@@ -36,7 +36,7 @@ class Hacker:
 
     def _prepare_prompts(
         self,
-        sample_size: int,
+        sample_size: int | None,
         verbose: bool,
         shuffle: bool,
     ) -> product | tqdm:
@@ -48,12 +48,16 @@ class Hacker:
             random.shuffle(questions)
         iters = list(product(prompts, questions))
         total_len = int(len(prompts) * len(questions))
-        iters = tqdm(iters, total=sample_size) if verbose else iters
+        iters = (
+            tqdm(iters, total=sample_size if sample_size else total_len)
+            if verbose
+            else iters
+        )
         return iters
 
     def run(
         self,
-        sample_size: int = 100,
+        sample_size: int | None = None,
         verbose: bool = False,
         shuffle: bool = False,
     ) -> list[QAReults]:
@@ -62,16 +66,8 @@ class Hacker:
         cnt = 0
         try:
             for prompt, question in iters:
-                try:
-                    query = prompt.format(query=question)
-                    answer = self._model.run(query)
-                except:
-                    print(
-                        f"""there was error during model api call.
-                          prompt : {prompt}
-                          question : {question}"""
-                    )
-                    continue
+                query = prompt.format(query=question)
+                answer = self._model.run(query)
                 result.append(
                     QAReults(
                         prompt=prompt,
@@ -85,6 +81,12 @@ class Hacker:
                     break
         except KeyboardInterrupt:
             return result
+        except:
+            print(
+                f"""there was error during model api call.
+                prompt : {prompt}
+                question : {question}"""
+            )
         return result
 
 
