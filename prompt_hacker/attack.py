@@ -5,7 +5,7 @@ import random
 from collections import defaultdict
 from pydantic import BaseModel
 from prompt_hacker.generator import JailBreakGenerator, MaliciousGenerator
-from prompt_hacker.llm import ChatBot
+from prompt_hacker.interface import ChatBaseModel
 from prompt_hacker import constant
 from openai import OpenAI
 import numpy as np
@@ -29,7 +29,7 @@ class EvaluationReport(BaseModel):
 
 
 class Hacker:
-    def __init__(self, model: ChatBot) -> None:
+    def __init__(self, model: ChatBaseModel) -> None:
         self._model = model
         self._jb = JailBreakGenerator()
         self._mal = MaliciousGenerator()
