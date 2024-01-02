@@ -1,4 +1,4 @@
-from prompt_hacker import constant
+from prompt_hacker import constant, prompts
 import requests
 import pandas as pd
 import warnings
@@ -27,11 +27,11 @@ class MaliciousGenerator(LLM):
     def __init__(self) -> None:
         super().__init__()
 
-    def __call__(self, num_retry: int = 5) -> list[str]:
+    def __call__(self, num_retry: int = 5, num_prompts: int = 30) -> list[str]:
         for _ in range(num_retry):
-            result = self._generate(constant.malicious_generator).split(
+            result = self._generate(prompts.malicious_generator(num_prompts)).split(
                 constant.prompt_seperator
-            )
+            )[0]
             if len(result) < 5:
                 continue
             return [i.strip() for i in result]
@@ -65,8 +65,8 @@ class JailBreakGenerator(LLM):
         return ls
 
     def __call__(self, num_examples: int = 5) -> list[str]:
-        query = constant.synthetic_prompt_generator(self._load_examples(num_examples))
-        return self._generate(query).split(constant.prompt_seperator)
+        query = prompts.synthetic_prompt_generator(self._load_examples(num_examples))
+        return self._generate(query).split(constant.prompt_seperator)[0]
 
     @property
     def jailbreak_prompt_list(self):
