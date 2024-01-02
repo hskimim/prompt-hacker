@@ -12,7 +12,7 @@ class LLM:
     def __init__(self) -> None:
         self._client = OpenAI()
 
-    def _generate(self, query: str) -> str:
+    def _generate(self, query: list[dict[str, str]]) -> str:
         response = self._client.chat.completions.create(
             model=constant.model_nm,
             temperature=0.9,
