@@ -1,29 +1,11 @@
 from prompt_hacker import constant, prompts
+from prompt_hacker.model import OpenAIChatModel
 import requests
 import pandas as pd
 import warnings
-from openai import OpenAI
-from dotenv import load_dotenv
-
-load_dotenv(verbose=True)
 
 
-class LLM:
-    def __init__(self) -> None:
-        self._client = OpenAI()
-
-    def _generate(self, query: list[dict[str, str]], **kwargs) -> str:
-        response = self._client.chat.completions.create(
-            kwargs,
-            model=constant.model_nm,
-            messages=query,
-        )
-
-        msg = response.choices[0].message.content
-        return msg
-
-
-class MaliciousGenerator(LLM):
+class MaliciousGenerator(OpenAIChatModel):
     def __init__(self) -> None:
         super().__init__()
 
@@ -44,7 +26,7 @@ class MaliciousGenerator(LLM):
         return constant.malicious_prompts
 
 
-class JailBreakGenerator(LLM):
+class JailBreakGenerator(OpenAIChatModel):
     def __init__(self) -> None:
         super().__init__()
         self._jailbreakers = self._crawl_jailbreakers()

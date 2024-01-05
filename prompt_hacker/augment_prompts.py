@@ -1,12 +1,7 @@
-from dotenv import load_dotenv
-from openai import OpenAI
-from prompt_hacker import constant
-from prompt_hacker.generator import LLM
-
-load_dotenv(True)
+from prompt_hacker.model import OpenAIChatModel
 
 
-class AugmentPrompts(LLM):
+class AugmentPrompts(OpenAIChatModel):
     """
     Sampling With A Decaying Temperature' implementation from 'Extracting Training Data from Large Language Models'.
     """
@@ -16,15 +11,13 @@ class AugmentPrompts(LLM):
 
     def augment(
         self,
-        input_: list[dict[str, str]],
+        input_: str,
         n: int = 50,
         max_tokens: int = 200,
     ) -> list[str]:
         high_temp_seq_length = int(max_tokens * 0.1)
 
-        if len(input_) != 1:
-            raise NotImplementedError("input_'s length should be 1")
-        response = self._generate(
+        response = self.run(
             query=input_,
             temperature=2,
             n=n,
@@ -32,24 +25,20 @@ class AugmentPrompts(LLM):
         )
 
         # concat input + output
-        concated_inputs_ = []
+        concated_inputs_: list[str] = []
         for choice in response.choices:
-            tmp = {
-                "role": "user",
-                "content": input_[0]["content"] + choice.message.content,
-            }
+            tmp = input_[0]["content"] + choice.message.content
             concated_inputs_.append(tmp)
 
-        augmented_answers = []
+        augmented_answers: list[str] = []
         for input_ in concated_inputs_:
-            response = self._generate(
+            response = self.run(
                 temperature=1,
                 max_tokens=max_tokens - high_temp_seq_length,
-                query=[input_],
+                query=input_,
             )
             answer = response.choices[0].message.content
             concat_answer = input_["content"] + answer  # concat input + output
             augmented_answers.append(concat_answer)
 
-        augmented_answers = list(set(augmented_answers))
-        return augmented_answers
+        return list(set(augmented_answers))
