@@ -30,5 +30,5 @@ poetry run tests/test.py
 
 1. jailbreaking test
    * `prompt_hacker.attack.Hacker`
-2. extracting test data
+2. extracting training data
    * coming soon
