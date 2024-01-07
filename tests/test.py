@@ -43,4 +43,4 @@ if __name__ == "__main__":
         [summary.prompt_score],
         index=["defended_ratio"],
     ).T  # the lower defended_ratio means the lower ability to defend against hacking
-    stat_df.to_csv("./test.csv", index=True)  # dump 5 rows only
+    stat_df.to_csv("./test.csv", index=True)
