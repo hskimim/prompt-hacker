@@ -7,6 +7,28 @@ During the deployment phase of a service, the risk of 'prompt hacking' is ever-p
 
 This project is dedicated to addressing the challenges of prompt hacking through the development of a module that facilitates both the modularization and automation of penetration testing. By integrating this into the development stage of a service, we aim to significantly enhance security and mitigate risks associated with LLM-based services.
 
-### Objectives
+#### Objectives
 - **Penetration Testing for Prompt Hacking**: Develop a comprehensive module that automates penetration testing specifically for prompt hacking vulnerabilities.
 - **Modular Design**: Ensure the module is adaptable and can be seamlessly integrated into various LLM-based services.
+
+
+### How To Test
+
+1. Write openai's API key in the `env` file and change the file name to `env` $\rightarrow$ `.env`
+
+```consoles
+OPENAI_API_KEY = "xxx"
+```
+
+1. run the `test.py`
+   
+```consoles
+poetry run tests/test.py
+```
+
+### Functions
+
+1. jailbreaking test
+   * `prompt_hacker.attack.Hacker`
+2. extracting test data
+   * coming soon

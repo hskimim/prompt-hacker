@@ -11,9 +11,9 @@ class MaliciousGenerator(OpenAIChatModel):
 
     def __call__(self, num_retry: int = 5, num_prompts: int = 30) -> list[str]:
         for _ in range(num_retry):
-            result = self._generate(prompts.malicious_generator(num_prompts)).split(
-                constant.prompt_seperator
-            )[0]
+            result = self._generate(
+                query=prompts.malicious_generator(num_prompts)
+            ).split(constant.prompt_seperator)[0]
             if len(result) < 5:
                 continue
             return [i.strip() for i in result]

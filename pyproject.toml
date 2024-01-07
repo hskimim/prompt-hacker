@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 packages = [{include = "prompt_hacker"}]
 
-[tool.poetry.dependencies]
+[tool.poetry.dependencies]  
 python = "^3.11"
 requests = "^2.31.0"
 openai = "^1.6.1"
