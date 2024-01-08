@@ -11,9 +11,9 @@ class MaliciousGenerator(OpenAIChatModel):
 
     def __call__(self, num_retry: int = 5, num_prompts: int = 30) -> list[str]:
         for _ in range(num_retry):
-            result = self._generate(
-                query=prompts.malicious_generator(num_prompts)
-            ).split(constant.prompt_seperator)[0]
+            result = self._generate(query=prompts.malicious_generator(num_prompts))[
+                0
+            ].split(constant.PROMPT_SEPERATOR)[0]
             if len(result) < 5:
                 continue
             return [i.strip() for i in result]
@@ -23,7 +23,7 @@ class MaliciousGenerator(OpenAIChatModel):
               5 pre-prepared examples will be returned in this time.
               """
         )
-        return constant.malicious_prompts
+        return constant.MALICIOUS_PROMPTS
 
 
 class JailBreakGenerator(OpenAIChatModel):
@@ -32,11 +32,11 @@ class JailBreakGenerator(OpenAIChatModel):
         self._jailbreakers = self._crawl_jailbreakers()
 
     def _crawl_jailbreakers(self) -> list[str]:
-        res = requests.get(constant.jailbreakchat_url)
+        res = requests.get(constant.JAILBREAKCHAT_URL)
         df = pd.DataFrame(res.json())
         df["votes"] = df.upvotes - df.downvotes
         df = df[df["votes"] > 0]  # filtering with its vote
-        df["text"] = df["text"].str.replace(constant.query_loc, "{query}")
+        df["text"] = df["text"].str.replace(constant.QUERY_LOC, "{query}")
         df.sort_values("votes", ascending=False, inplace=True)
         return df["text"].values.tolist()
 
@@ -48,7 +48,7 @@ class JailBreakGenerator(OpenAIChatModel):
 
     def __call__(self, num_examples: int = 5) -> list[str]:
         query = prompts.synthetic_prompt_generator(self._load_examples(num_examples))
-        return self._generate(query).split(constant.prompt_seperator)[0]
+        return self._generate(query)[0].split(constant.PROMPT_SEPERATOR)[0]
 
     @property
     def jailbreak_prompt_list(self):

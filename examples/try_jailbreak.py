@@ -7,7 +7,7 @@ import pandas as pd
 from openai import OpenAI
 
 from prompt_hacker.interface import ChatBaseModel
-from prompt_hacker.attack import Hacker, Evaluator
+from prompt_hacker.attack.jailbreak import JailBreaker, Evaluator
 
 
 load_dotenv(True)
@@ -32,7 +32,7 @@ class LLM(ChatBaseModel):
 
 if __name__ == "__main__":
     model = LLM()
-    hacker = Hacker(model=model)
+    hacker = JailBreaker(model=model)
     result = hacker.run(sample_size=100, verbose=True, shuffle=True)
 
     evaluator = Evaluator()
@@ -43,4 +43,4 @@ if __name__ == "__main__":
         [summary.prompt_score],
         index=["defended_ratio"],
     ).T  # the lower defended_ratio means the lower ability to defend against hacking
-    stat_df.to_csv("./test.csv", index=True)
+    stat_df.to_csv("./jailbreak_examples.csv", index=True)

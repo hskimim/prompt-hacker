@@ -28,7 +28,7 @@ class EvaluationReport(BaseModel):
     question_score: dict[str, float]
 
 
-class Hacker:
+class JailBreaker:
     def __init__(self, model: ChatBaseModel) -> None:
         self._model = model
         self._jb = JailBreakGenerator()
@@ -104,14 +104,14 @@ class Evaluator:
         text = text.replace("\n", " ")
         return (
             self._client.embeddings.create(
-                input=[text], model=constant.embedding_model_nm
+                input=[text], model=constant.EMBEDDING_MODEL_NM
             )
             .data[0]
             .embedding
         )
 
     def evaluate(self, result: list[QAReults]) -> list[EvaluatedQAResult]:
-        e_reject = self._get_embedding(constant.rejected_prompt)
+        e_reject = self._get_embedding(constant.REJECTED_PROMPT)
         evaluated = []
 
         for qa in result:
