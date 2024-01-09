@@ -29,11 +29,11 @@ This project is dedicated to addressing the challenges of prompt hacking through
 
 
 ## Get Started
+### jailbreak test
 can try with 
 ```consoles
 poetry run python examples/try_jailbreak.py
 ```
-### jailbreak test
 
 ```python
 from openai import OpenAI
