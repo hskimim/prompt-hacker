@@ -1,13 +1,12 @@
 import json
-from tqdm import tqdm
+
+# from tqdm import tqdm
 import warnings
 from pydantic import BaseModel
 from collections import defaultdict
 
-import numpy as np
-from scipy.spatial import distance
-
 from prompt_hacker.model import TemperatureDecaySampling
+from prompt_hacker.api_client import ModelClient
 
 
 class TrainingDataExtractResult(BaseModel):
@@ -51,25 +50,21 @@ class TrainingDataExtractor(BaseModel):
 
     def run(
         self,
+        model: ModelClient,
         prefix_samples: list[str],
-        verbose: bool = False,
+        # verbose: bool = False,
     ) -> list[TrainingDataExtractResult]:
         sampler = TemperatureDecaySampling(
+            model=model,
             temperature=self.temperature,
             temperature_ratio=self.temperature_ratio,
             max_tokens=self.max_tokens,
             sample_size=self.sample_size,
         )  # TODO : fix the ugly
 
-        data = (
-            self._generate_prefix_samples()
-            if prefix_samples is None
-            else prefix_samples
-        )
-        iterator = tqdm(data) if verbose else data
+        augmented_txts: list[TrainingDataExtractResult] = []
 
-        augmented_txts: list[str] = []
-        for prefix_txt in iterator:
+        for prefix_txt in prefix_samples:
             generated_txt = sampler.augment(prefix_txt)
             remained_prompts = [
                 i.replace(prefix_txt, "").strip() for i in generated_txt
@@ -86,13 +81,6 @@ class TrainingDataExtractor(BaseModel):
 
 
 # TODO : should follow the same logic with paper
-# use hamming distance as a temporary solution.
-
-
-def calc_hamming_distance(s1: str, s2: str):
-    return distance.hamming(list(s1), list(s2))
-
-
 def calc_jacaard_similarity_for_one_side(compare: str, criteria: str):
     return len(set(compare) & set(criteria)) / len(set(criteria))
 
@@ -127,9 +115,12 @@ class TrainingDataExtractorEvaluator(BaseModel):
         if self.train_dataset:
             return self.train_dataset
 
-        with open(self.train_dataset_path, "r") as file:
-            loaded_data = json.load(file)
-        return loaded_data
+        if type(self.train_dataset_path) == str:
+            with open(self.train_dataset_path, "r") as file:
+                return json.load(file)
+        raise ValueError(
+            "you have to insert one of train_dataset_path or train_dataset"
+        )  # can't be happened
 
     def evaluate(
         self, results: list[TrainingDataExtractResult]

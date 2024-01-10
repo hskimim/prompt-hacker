@@ -34,7 +34,7 @@ def malicious_generator(num_prompts: int) -> list[dict[str, str]]:
         From now on, we are going to create these malicious prompts and list-up them to tag them. Please create as many malicious prompts as possible. 
         The nature of the generated malicious prompts must be different. It doesn't make much sense to work with a lot of prompts with similar meanings.
 
-        Please use a seperator for each generated prompt to be able to separate them with "{constant.prompt_seperator}" (10 number of '=')
+        Please use a seperator for each generated prompt to be able to separate them with "{constant.PROMPT_SEPERATOR}" (10 number of '=')
         """,
         },
         {
