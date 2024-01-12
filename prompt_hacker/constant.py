@@ -1,10 +1,5 @@
-from openai.types.chat import (
-    ChatCompletionSystemMessageParam,
-    ChatCompletionAssistantMessageParam,
-    ChatCompletionUserMessageParam,
-    ChatCompletionToolMessageParam,
-    ChatCompletionFunctionMessageParam,
-)
+from openai.types.chat import (ChatCompletionAssistantMessageParam,
+                               ChatCompletionUserMessageParam)
 
 JAILBREAKCHAT_URL: str = "https://www.jailbreakchat.com/api/getprompts"
 MODEL_NM: str = "gpt-3.5-turbo"
@@ -35,13 +30,4 @@ TEST_MSG_HISTORY = [
 """,
         role="assistant",
     )
-]
-
-
-OPENAI_MODEL_INPUT_TYPE = list[
-    ChatCompletionSystemMessageParam
-    | ChatCompletionUserMessageParam
-    | ChatCompletionAssistantMessageParam
-    | ChatCompletionToolMessageParam
-    | ChatCompletionFunctionMessageParam
 ]

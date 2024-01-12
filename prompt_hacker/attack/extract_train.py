@@ -1,12 +1,12 @@
 import json
-
-# from tqdm import tqdm
 import warnings
-from pydantic import BaseModel
 from collections import defaultdict
 
-from prompt_hacker.model import TemperatureDecaySampling
+from pydantic import BaseModel
+from tqdm import tqdm, trange
+
 from prompt_hacker.api_client import ModelClient
+from prompt_hacker.model import TemperatureDecaySampling
 
 
 class TrainingDataExtractResult(BaseModel):
@@ -52,7 +52,7 @@ class TrainingDataExtractor(BaseModel):
         self,
         model: ModelClient,
         prefix_samples: list[str],
-        # verbose: bool = False,
+        verbose: bool = False,
     ) -> list[TrainingDataExtractResult]:
         sampler = TemperatureDecaySampling(
             model=model,
@@ -63,8 +63,9 @@ class TrainingDataExtractor(BaseModel):
         )  # TODO : fix the ugly
 
         augmented_txts: list[TrainingDataExtractResult] = []
-
-        for prefix_txt in prefix_samples:
+        
+        iters = tqdm(iterable=prefix_samples) if verbose else prefix_samples
+        for prefix_txt in iters:
             generated_txt = sampler.augment(prefix_txt)
             remained_prompts = [
                 i.replace(prefix_txt, "").strip() for i in generated_txt

@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletionUserMessageParam
-from prompt_hacker.interface import ChatBaseModel
+
 from prompt_hacker import constant
+from prompt_hacker.interface import ChatBaseModel
 
 load_dotenv(verbose=True)
 

@@ -1,8 +1,10 @@
+import warnings
+
+import pandas as pd
+import requests
+
 from prompt_hacker import constant, prompts
 from prompt_hacker.model import OpenAIChatModel
-import requests
-import pandas as pd
-import warnings
 
 
 class MaliciousGenerator(OpenAIChatModel):

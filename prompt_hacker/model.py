@@ -1,10 +1,10 @@
-from prompt_hacker import constant
-from prompt_hacker.interface import ChatBaseModel
-from prompt_hacker.api_client import ModelClient, TestModelClient
-
-from openai import OpenAI
-
 from dotenv import load_dotenv
+from openai import OpenAI
+from openai.types.chat import ChatCompletionMessageParam
+
+from prompt_hacker import constant
+from prompt_hacker.api_client import ModelClient
+from prompt_hacker.interface import ChatBaseModel
 
 load_dotenv(verbose=True)
 
@@ -17,7 +17,7 @@ class OpenAIChatModel(ChatBaseModel):
         self._client = OpenAI()
 
     def _generate(
-        self, question: constant.OPENAI_MODEL_INPUT_TYPE, **kwargs
+        self, question: ChatCompletionMessageParam, **kwargs
     ) -> list[str]:
         response = self._client.chat.completions.create(
             **kwargs,
@@ -40,7 +40,7 @@ class TemperatureDecaySampling:
 
     def __init__(
         self,
-        model: ChatBaseModel,
+        model: ModelClient,
         temperature: float = 2.0,
         temperature_ratio: float = 0.1,
         max_tokens: int = 200,
