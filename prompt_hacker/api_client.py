@@ -1,24 +1,20 @@
 from dotenv import load_dotenv
-import pandas as pd
 from openai import OpenAI
+from openai.types.chat import ChatCompletionUserMessageParam
 
-from prompt_hacker.interface import ChatBaseModel
 from prompt_hacker import constant
+from prompt_hacker.interface import ChatBaseModel
 
-load_dotenv(True)
+load_dotenv(verbose=True)
 
 
 class ModelClient(ChatBaseModel):
-    ...
-
-
-class TestModelClient(ChatBaseModel):
     def run(self, question: str, **kwargs) -> list[str]:
         input_ = constant.TEST_MSG_HISTORY + [
-            {
-                "role": "user",
-                "content": question,
-            },
+            ChatCompletionUserMessageParam(
+                content=question,
+                role="user",
+            )
         ]
 
         response = OpenAI().chat.completions.create(
@@ -26,4 +22,9 @@ class TestModelClient(ChatBaseModel):
             messages=input_,
             **kwargs,
         )
-        return [choice.message.content for choice in response.choices]
+
+        return [
+            choice.message.content
+            for choice in response.choices
+            if choice.message.content
+        ]

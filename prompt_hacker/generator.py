@@ -1,8 +1,10 @@
+import warnings
+
+import pandas as pd
+import requests
+
 from prompt_hacker import constant, prompts
 from prompt_hacker.model import OpenAIChatModel
-import requests
-import pandas as pd
-import warnings
 
 
 class MaliciousGenerator(OpenAIChatModel):
@@ -11,9 +13,9 @@ class MaliciousGenerator(OpenAIChatModel):
 
     def __call__(self, num_retry: int = 5, num_prompts: int = 30) -> list[str]:
         for _ in range(num_retry):
-            result = self._generate(query=prompts.malicious_generator(num_prompts))[
+            result = self._generate(question=prompts.malicious_generator(num_prompts))[
                 0
-            ].split(constant.PROMPT_SEPERATOR)[0]
+            ][0].split(constant.PROMPT_SEPERATOR)[0]
             if len(result) < 5:
                 continue
             return [i.strip() for i in result]
@@ -48,7 +50,7 @@ class JailBreakGenerator(OpenAIChatModel):
 
     def __call__(self, num_examples: int = 5) -> list[str]:
         query = prompts.synthetic_prompt_generator(self._load_examples(num_examples))
-        return self._generate(query)[0].split(constant.PROMPT_SEPERATOR)[0]
+        return self._generate(query)[0].split(constant.PROMPT_SEPERATOR)
 
     @property
     def jailbreak_prompt_list(self):

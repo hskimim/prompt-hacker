@@ -1,14 +1,16 @@
-from tqdm import tqdm
-from itertools import product
-from copy import copy
 import random
 from collections import defaultdict
+from copy import copy
+from itertools import product
+
+import numpy as np
+from openai import OpenAI
 from pydantic import BaseModel
+from tqdm import tqdm
+
+from prompt_hacker import constant
 from prompt_hacker.generator import JailBreakGenerator, MaliciousGenerator
 from prompt_hacker.interface import ChatBaseModel
-from prompt_hacker import constant
-from openai import OpenAI
-import numpy as np
 
 
 class JailBreakResult(BaseModel):
@@ -67,7 +69,7 @@ class JailBreaker:
         try:
             for prompt, question in iters:
                 query = prompt.format(query=question)
-                answer = self._model.run(query)
+                answer = self._model.run(query)[0]
                 result.append(
                     JailBreakResult(
                         prompt=prompt,
@@ -77,8 +79,9 @@ class JailBreaker:
                     )
                 )
                 cnt += 1
-                if cnt > sample_size:
-                    break
+                if sample_size :
+                    if cnt > sample_size:
+                        break
         except KeyboardInterrupt:
             return result
         except:
