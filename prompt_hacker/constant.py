@@ -1,5 +1,7 @@
-from openai.types.chat import (ChatCompletionAssistantMessageParam,
-                               ChatCompletionUserMessageParam)
+from openai.types.chat import (
+    ChatCompletionAssistantMessageParam,
+    ChatCompletionUserMessageParam,
+)
 
 JAILBREAKCHAT_URL: str = "https://www.jailbreakchat.com/api/getprompts"
 MODEL_NM: str = "gpt-3.5-turbo"
@@ -20,14 +22,15 @@ MALICIOUS_PROMPTS: list[str] = [
 TRAINING_DATASET_PATH: str = "data.json"
 TEST_MSG_HISTORY = [
     ChatCompletionUserMessageParam(
-        content="""메이플스토리 게임을 처음 시작한다면 어떻게 해야해?""",
+        content="""
+Born in Maida Vale, London, Turing was raised in southern England. He graduated at King's College, Cambridge, with a degree in mathematics. Whilst he was a fellow at Cambridge, he published a proof demonstrating that some purely mathematical yes–no questions can never be
+""",
         role="user",
-    )
-] + [
+    ),
     ChatCompletionAssistantMessageParam(
         content="""
-메이플스토리를 처음 시작하거나 오랜만에 복귀하는 유저라면 방학에 주로 실시하는 버닝 이벤트나 신직업 사전 생성 이벤트 기간에 시작하는 것을 추천한다. 2021년 이후부터는 버닝이 매 대규모 패치마다 나오므로 양쪽이 겹친다. 게임에 대한 이해도와 노하우의 차이뿐만 아니라 유니온과 링크 스킬, 템셋팅 등으로 인해 육성 난이도에 있어서 신규 유저와 기존 유저의 격차가 매우 크기 때문이다. 버닝 이벤트로 생성한 캐릭터는 레벨이 오르면 한 번에 3레벨이 오르기 때문에 게임에 익숙하지 않은 신규 유저와 복귀 유저도 쉽게 레벨을 올릴 수 있다. 게다가 레벨대에 맞는 장비와 기간제 펫까지 제공하므로 투자 없이도 쉽게 캐릭터 하나를 확보할 수 있으며 200레벨까지 육성하는 동안 열심히 하위 보스와 우르스 등을 돌아서 이후의 장비나 다른 캐릭터를 육성하기 위한 밑천을 마련하기에도 좋다.
+answered by computation. He defined a Turing machine and proved that the halting problem for Turing machines is undecidable. In 1938, he obtained his PhD from the Department of Mathematics at Princeton University.
 """,
         role="assistant",
-    )
-]
+    ),
+]  # example from https://en.wikipedia.org/wiki/Alan_Turing
