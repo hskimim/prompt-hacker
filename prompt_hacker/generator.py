@@ -1,6 +1,5 @@
 import warnings
 
-import numpy as np
 import pandas as pd
 import requests
 
@@ -14,19 +13,17 @@ class MaliciousGenerator(OpenAIChatModel):
         super().__init__()
 
     def __call__(self, num_retry: int = 5, num_prompts: int = 30) -> list[str]:
-        temperature_trials = np.linspace(1, 2, num_retry)
-        for trial in range(num_retry):
+        for _ in range(num_retry):
             result = self._generate(
                 question=prompts.malicious_generator(num_prompts),  # type:ignore
-                temperature=temperature_trials[trial],
+                temperature=1.5,
             )[0][0].split(constant.PROMPT_SEPERATOR)[0]
             if len(result) < num_prompts / 10:
                 continue
             return [i.strip() for i in result]
         warnings.warn(
             """Failed to create malicious prompt. It appears to be due to OpenAI's policy.
-              Try by increasing the size of temepature or increasing the number of num_retry.
-              5 pre-prepared examples will be returned in this time.
+              pre-prepared examples will be returned in this time.
               """
         )
         return constant.MALICIOUS_PROMPTS
@@ -94,20 +91,21 @@ class TemperatureDecaySampling:
         init_question: str,
     ) -> list[str]:
         high_temp_seq_length = int(self.max_tokens * self.temperature_ratio)
-
         messages: list[str] = self.model.run(
             question=init_question,
             temperature=self.temperature,
             n=self.sample_size,
             max_tokens=high_temp_seq_length,
         )
-
         # concat input + output
         concated_inputs_ = [init_question + msg for msg in messages]
 
         self.temperature = 1
         self.max_tokens = self.max_tokens - high_temp_seq_length
         self.sample_size = 1
+
+        if self.max_tokens == 0:
+            return concated_inputs_
 
         augmented_answers: list[str] = []
 
