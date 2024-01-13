@@ -3,10 +3,11 @@ import warnings
 from collections import defaultdict
 
 from pydantic import BaseModel
-from tqdm import tqdm, trange
+from tqdm import tqdm
 
-from prompt_hacker.api_client import ModelClient
-from prompt_hacker.model import TemperatureDecaySampling
+from prompt_hacker import utils
+from prompt_hacker.generator import TemperatureDecaySampling
+from prompt_hacker.interface import ChatBaseModel
 
 
 class TrainingDataExtractResult(BaseModel):
@@ -22,27 +23,22 @@ class EvaluationReport(BaseModel):
     score_by_prefix: dict[str, float]
 
 
-class TrainingDataExtractor(BaseModel):
-    train_dataset_path: str | None = None
-    train_dataset: list[str] | None = None
-    temperature: float = 0.2
-    temperature_ratio: float = 0.1
-    max_tokens: int = 200
-    sample_size: int = 50
-
+class TrainingDataExtractor:
     def __init__(
         self,
+        model: ChatBaseModel,
         temperature: float = 0.2,
         temperature_ratio: float = 0.1,
         max_tokens: int = 200,
         sample_size: int = 50,
     ) -> None:
-        super().__init__(
+        self.sampler = TemperatureDecaySampling(
+            model=model,
             temperature=temperature,
             temperature_ratio=temperature_ratio,
             max_tokens=max_tokens,
             sample_size=sample_size,
-        )
+        )  # TODO : fix the ugly
 
     def _generate_prefix_samples(self):
         # TODO : generate fractional samples from training dataset
@@ -50,23 +46,14 @@ class TrainingDataExtractor(BaseModel):
 
     def run(
         self,
-        model: ModelClient,
         prefix_samples: list[str],
         verbose: bool = False,
     ) -> list[TrainingDataExtractResult]:
-        sampler = TemperatureDecaySampling(
-            model=model,
-            temperature=self.temperature,
-            temperature_ratio=self.temperature_ratio,
-            max_tokens=self.max_tokens,
-            sample_size=self.sample_size,
-        )  # TODO : fix the ugly
-
         augmented_txts: list[TrainingDataExtractResult] = []
-        
+
         iters = tqdm(iterable=prefix_samples) if verbose else prefix_samples
-        for prefix_txt in iters:
-            generated_txt = sampler.augment(prefix_txt)
+        for prefix_txt in iters:  # type: ignore
+            generated_txt = self.sampler.augment(prefix_txt)
             remained_prompts = [
                 i.replace(prefix_txt, "").strip() for i in generated_txt
             ]
@@ -79,11 +66,6 @@ class TrainingDataExtractor(BaseModel):
                 for txt in remained_prompts
             ]
         return augmented_txts
-
-
-# TODO : should follow the same logic with paper
-def calc_jacaard_similarity_for_one_side(compare: str, criteria: str):
-    return len(set(compare) & set(criteria)) / len(set(criteria))
 
 
 class TrainingDataExtractorEvaluator(BaseModel):
@@ -116,7 +98,7 @@ class TrainingDataExtractorEvaluator(BaseModel):
         if self.train_dataset:
             return self.train_dataset
 
-        if type(self.train_dataset_path) == str:
+        if isinstance(self.train_dataset_path, str):
             with open(self.train_dataset_path, "r") as file:
                 return json.load(file)
         raise ValueError(
@@ -130,7 +112,7 @@ class TrainingDataExtractorEvaluator(BaseModel):
         evaluated = []
         for result in results:
             suffix = result.suffix_prompt  # fully generated sentence
-            score = calc_jacaard_similarity_for_one_side(
+            score = utils.calc_jacaard_similarity_for_one_side(  # TODO : should follow the same logic with paper
                 compare=train_data, criteria=suffix
             )
             evaluated.append(
