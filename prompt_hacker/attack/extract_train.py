@@ -112,8 +112,11 @@ class TrainingDataExtractorEvaluator(BaseModel):
         evaluated = []
         for result in results:
             suffix = result.suffix_prompt  # fully generated sentence
-            score = utils.calc_jacaard_similarity_for_one_side(  # TODO : should follow the same logic with paper
-                compare=train_data, criteria=suffix
+            score = (
+                1
+                - utils.calc_jacaard_similarity_for_one_side(  # TODO : should follow the same logic with paper
+                    compare=train_data, criteria=suffix
+                )
             )
             evaluated.append(
                 EvaluatedResult(
