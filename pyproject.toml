@@ -18,6 +18,7 @@ tqdm = "^4.66.1"
 scipy = "^1.11.4"
 pandas-stubs = "^2.1.4.231227"
 types-tqdm = "^4.66.0.20240106"
+types-requests = "^2.31.0.20240106"
 
 
 [tool.poetry.group.dev.dependencies]
