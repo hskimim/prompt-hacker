@@ -31,6 +31,8 @@ This project is dedicated to addressing the challenges of prompt hacking through
 ### others
 - [X] Create an interface that makes it easier for arbitrary chatbots to be integrated.
 - [ ] Unify the return type of the evaluator to support the pipeline of attackers and evaluators.
+- [ ] Pipeline design that allows you to use various attackers on a single model and receive results
+- [ ] Make some benchmarks using open/close model such as chatgpt, llama etc
 - [ ] Modify to send prompts (model call) asynchronously.
     - [ ] async get_embeddings
     - [ ] async interface's run
