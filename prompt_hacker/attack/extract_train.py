@@ -18,6 +18,9 @@ class TrainingDataExtractor:
         self.temperature_ratio = temperature_ratio
         self.max_tokens = max_tokens
 
+    def __str__(self) -> str:
+        return "extract_train"
+
     def _generate_prefix_samples(self):
         # TODO : generate fractional samples from training dataset
         raise NotImplementedError()

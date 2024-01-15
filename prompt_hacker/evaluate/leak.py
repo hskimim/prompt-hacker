@@ -9,6 +9,9 @@ class PromptLeakEvaluator:
         self.sys_prompt = sys_prompt
         self._embedder = OpenAIEmbedModel()
 
+    def __str__(self) -> str:
+        return "leak"
+
     def evaluate(
         self,
         results: list[PromptLeakResult],

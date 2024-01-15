@@ -23,6 +23,9 @@ class PromptInjector:
         self.model = model
         self.sys_generator = SystemPromptGenerator()
 
+    def __str__(self) -> str:
+        return "inject"
+
     def run(
         self,
         sample_size: int = 1,

@@ -8,6 +8,9 @@ class PromptInjectorEvaluator:
         self.sys_prompt = sys_prompt
         self._embedder = OpenAIEmbedModel()
 
+    def __str__(self) -> str:
+        return "inject"
+
     def evaluate(self, results: list[PromptInjectResult]) -> list[PromptInjectScore]:
         sys_embed = self._embedder.run([self.sys_prompt])
         evaluated: list[PromptInjectScore] = []

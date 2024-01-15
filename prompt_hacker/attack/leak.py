@@ -22,6 +22,9 @@ class PromptLeaker:
         self.temperature_ratio = temperature_ratio
         self.max_tokens = max_tokens
 
+    def __str__(self) -> str:
+        return "leak"
+
     def run(
         self,
         sample_size: int = 50,

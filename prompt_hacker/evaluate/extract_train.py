@@ -37,6 +37,9 @@ class TrainingDataExtractorEvaluator(BaseModel):
         self.train_dataset_path = train_dataset_path
         self.train_dataset = train_dataset
 
+    def __str__(self) -> str:
+        return "extract_train"
+
     def _load_train(self) -> str:
         if self.train_dataset:
             return self.train_dataset

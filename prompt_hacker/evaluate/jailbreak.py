@@ -7,6 +7,9 @@ class JailBreakEvaluator:
     def __init__(self):
         self._embedder = OpenAIEmbedModel()
 
+    def __str__(self) -> str:
+        return "jailbreak"
+
     def evaluate(self, results: list[JailBreakResult]) -> list[JailBreakScore]:
         e_reject = self._embedder.run([constant.REJECTED_PROMPT])
         evaluated = []

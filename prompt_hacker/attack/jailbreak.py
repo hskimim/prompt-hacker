@@ -15,6 +15,9 @@ class JailBreaker:
         self._jb = JailBreakGenerator()
         self._mal = MaliciousGenerator()
 
+    def __str__(self) -> str:
+        return "jailbreak"
+
     def _prepare_prompts(
         self,
         sample_size: int | None,
