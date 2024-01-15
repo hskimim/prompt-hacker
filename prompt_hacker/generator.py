@@ -1,3 +1,4 @@
+import time
 import warnings
 
 import pandas as pd
@@ -12,13 +13,18 @@ class MaliciousGenerator(OpenAIChatModel):
     def __init__(self) -> None:
         super().__init__()
 
-    def __call__(self, num_retry: int = 5, num_prompts: int = 30) -> list[str]:
+    def __call__(
+        self, num_retry: int = 5, tol_time: int = 30, num_prompts: int = 30
+    ) -> list[str]:
+        start_t = time.time()
         for _ in range(num_retry):
             result = self._generate(
                 question=prompts.malicious_generator(num_prompts),  # type:ignore
                 temperature=1.5,
             )[0][0].split(constant.PROMPT_SEPERATOR)[0]
             if len(result) < num_prompts / 10:
+                if time.time() - start_t > tol_time:
+                    break
                 continue
             return [i.strip() for i in result]
         warnings.warn(
