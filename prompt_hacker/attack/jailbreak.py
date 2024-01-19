@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from prompt_hacker import constant, utils
 from prompt_hacker.generator import JailBreakGenerator, MaliciousGenerator
-from prompt_hacker.interface import ChatBaseModel
+from prompt_hacker.interface import Attacker, ChatBaseModel, Evaluator
 from prompt_hacker.model import OpenAIEmbedModel
 from prompt_hacker.schemas import (
     Evaluation,
@@ -15,15 +15,17 @@ from prompt_hacker.schemas import (
     JailBreakScore,
 )
 
+MODEL_NM = "jailbreak"
 
-class JailBreaker:
+
+class JailBreaker(Attacker):
     def __init__(self, model: ChatBaseModel) -> None:
         self._model = model
         self._jb = JailBreakGenerator()
         self._mal = MaliciousGenerator()
 
     def __str__(self) -> str:
-        return "jailbreak"
+        return MODEL_NM
 
     def _prepare_prompts(
         self,
@@ -31,7 +33,6 @@ class JailBreaker:
         verbose: bool,
         shuffle: bool,
     ) -> product | tqdm:
-        # TODO: Refactor for cleaner and more interpretable
         prompts = copy(self._jb.jailbreak_prompt_list)
         questions = copy(self._mal())
         if shuffle:
@@ -54,7 +55,7 @@ class JailBreaker:
         )
         result = []
         cnt = 0
-        try:
+        try:  # TODO : make it async
             for prompt, question in iters:  # type: ignore
                 query = prompt.format(query=question)
                 answer = self._model.run(query)[0]
@@ -81,12 +82,12 @@ class JailBreaker:
         return result
 
 
-class JailBreakEvaluator:
+class JailBreakEvaluator(Evaluator):
     def __init__(self):
         self._embedder = OpenAIEmbedModel()
 
     def __str__(self) -> str:
-        return "jailbreak"
+        return MODEL_NM
 
     def evaluate(self, results: list[JailBreakResult]) -> list[JailBreakScore]:
         e_reject = self._embedder.run([constant.REJECTED_PROMPT])

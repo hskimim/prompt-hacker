@@ -1,12 +1,11 @@
 import json
 import warnings
 
-from pydantic import BaseModel
 from tqdm import tqdm
 
 from prompt_hacker import utils
 from prompt_hacker.generator import TemperatureDecaySampling
-from prompt_hacker.interface import ChatBaseModel
+from prompt_hacker.interface import Attacker, ChatBaseModel, Evaluator
 from prompt_hacker.schemas import (
     Evaluation,
     TrainingDataExtractResult,
@@ -14,8 +13,10 @@ from prompt_hacker.schemas import (
     TrainingExtractScore,
 )
 
+MODEL_NM = "extract_train"
 
-class TrainingDataExtractor:
+
+class TrainingDataExtractor(Attacker):
     def __init__(
         self,
         model: ChatBaseModel,
@@ -29,7 +30,7 @@ class TrainingDataExtractor:
         self.max_tokens = max_tokens
 
     def __str__(self) -> str:
-        return "extract_train"
+        return MODEL_NM
 
     def _generate_prefix_samples(self):
         # TODO : generate fractional samples from training dataset
@@ -57,20 +58,12 @@ class TrainingDataExtractor:
         return augmented_txts
 
 
-class TrainingDataExtractorEvaluator(BaseModel):
-    train_dataset_path: str | None = None
-    train_dataset: str | None = None
-
+class TrainingDataExtractorEvaluator(Evaluator):
     def __init__(
         self,
         train_dataset_path: str | None = None,
         train_dataset: str | None = None,
     ) -> None:
-        super().__init__(
-            train_dataset_path=train_dataset_path,
-            train_dataset=train_dataset,
-        )
-
         if not (train_dataset or train_dataset_path):
             raise ValueError(
                 "you have to insert one of train_dataset_path or train_dataset"
@@ -84,7 +77,7 @@ class TrainingDataExtractorEvaluator(BaseModel):
         self.train_dataset = train_dataset
 
     def __str__(self) -> str:
-        return "extract_train"
+        return MODEL_NM
 
     def _load_train(self) -> str:
         if self.train_dataset:
