@@ -19,9 +19,12 @@ class MaliciousGenerator(OpenAIChatModel):
         self, num_retry: int = 3, tol_time: int = 30, num_prompts: int = 30
     ) -> list[str]:
         start_t = time.time()
-        for _ in range(num_retry):
+        for proc in range(num_retry):
             result = self._generate(
-                question=prompts.malicious_generator(num_prompts),  # type:ignore
+                question=prompts.malicious_generator(
+                    num_prompts,
+                    PigLatinGenerator()(word="malicious") if proc else None,
+                ),  # type:ignore
                 temperature=1.5,
             )[0][0].split(constant.PROMPT_SEPERATOR)[0]
             if len(result) < num_prompts / 10:
@@ -77,6 +80,17 @@ class SystemPromptGenerator(OpenAIChatModel):
     def __call__(self, num_examples: int = 5) -> list[str]:
         query = prompts.system_prompt_generator(num_prompts=num_examples)
         return self._generate(query)[0].split(constant.PROMPT_SEPERATOR)
+
+
+class PigLatinGenerator(OpenAIChatModel):
+    """replace sensitive word with pig latin game"""
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def __call__(self, word: str) -> str:
+        query = prompts.pig_latin_generator(word)
+        return self._generate(query)[0]
 
 
 class TemperatureDecaySampling:
