@@ -46,7 +46,7 @@ class PromptLeaker(Attacker):
             temperature_ratio=self.temperature_ratio,
         )
         results: list[PromptLeakResult] = []
-        iters = tqdm(PROMPTS) if inputs.verbose else PROMPTS
+        iters = tqdm(PROMPTS, desc=MODEL_NM) if inputs.verbose else PROMPTS
 
         results = [
             PromptLeakResult(prompt=prompt, answer=answer)

@@ -41,7 +41,11 @@ class JailBreaker(Attacker):
         iters = list(product(prompts, questions))
         total_len = int(len(prompts) * len(questions))
         iters = (
-            tqdm(iters, total=sample_size if sample_size else total_len)  # type: ignore
+            tqdm(
+                iters,
+                total=sample_size if sample_size else total_len,
+                desc=MODEL_NM,
+            )  # type: ignore
             if verbose  # type: ignore
             else iters  # type: ignore
         )
@@ -55,8 +59,8 @@ class JailBreaker(Attacker):
         )
         result = []
         cnt = 0
-        try:  # TODO : make it async
-            for prompt, question in iters:  # type: ignore
+        for prompt, question in iters:  # type: ignore
+            try:
                 query = prompt.format(query=question)
                 answer = self._model.run(query)[0]
                 result.append(
@@ -71,14 +75,14 @@ class JailBreaker(Attacker):
                 if inputs.sample_size:
                     if cnt > inputs.sample_size:
                         break
-        except KeyboardInterrupt:
-            return result
-        except Exception:
-            print(
-                f"""there was error during model api call.
-                prompt : {prompt}
-                question : {question}"""
-            )
+            except KeyboardInterrupt:
+                return result
+            except Exception:
+                print(
+                    f"""there was error during model api call.
+                    prompt : {prompt}
+                    question : {question}"""
+                )
         return result
 
 

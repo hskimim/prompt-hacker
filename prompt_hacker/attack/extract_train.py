@@ -44,7 +44,11 @@ class TrainingDataExtractor(Attacker):
             max_tokens=self.max_tokens,
             sample_size=inputs.sample_size,
         )
-        iters = tqdm(inputs.prefix_samples) if inputs.verbose else inputs.prefix_samples
+        iters = (
+            tqdm(inputs.prefix_samples, desc=MODEL_NM)
+            if inputs.verbose
+            else inputs.prefix_samples
+        )
         augmented_txts = [
             TrainingDataExtractResult(
                 prefix_prompt=prefix_txt,

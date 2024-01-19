@@ -36,7 +36,11 @@ class PromptInjector(Attacker):
 
     def run(self, inputs: PromptInjectInputs) -> list[PromptInjectResult]:
         generated_prompts = self.sys_generator(num_examples=inputs.sample_size)
-        iters = tqdm(generated_prompts) if inputs.verbose else generated_prompts
+        iters = (
+            tqdm(generated_prompts, desc=MODEL_NM)
+            if inputs.verbose
+            else generated_prompts
+        )
         return [
             PromptInjectResult(
                 injected_prompt=injected_sys_prompt,
