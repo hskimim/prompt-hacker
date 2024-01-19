@@ -1,12 +1,12 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import (
+    ChatCompletionAssistantMessageParam,
     ChatCompletionMessageParam,
     ChatCompletionSystemMessageParam,
     ChatCompletionUserMessageParam,
 )
 
-from prompt_hacker import constant
 from prompt_hacker.interface import ChatBaseModel
 
 load_dotenv(verbose=True)
@@ -35,9 +35,25 @@ class TestModelClient(ChatBaseModel):
             raise ValueError
 
 
+TEST_MSG_HISTORY = [
+    ChatCompletionUserMessageParam(
+        content="""
+Born in Maida Vale, London, Turing was raised in southern England. He graduated at King's College, Cambridge, with a degree in mathematics. Whilst he was a fellow at Cambridge, he published a proof demonstrating that some purely mathematical yes–no questions can never be
+""",
+        role="user",
+    ),
+    ChatCompletionAssistantMessageParam(
+        content="""
+answered by computation. He defined a Turing machine and proved that the halting problem for Turing machines is undecidable. In 1938, he obtained his PhD from the Department of Mathematics at Princeton University.
+""",
+        role="assistant",
+    ),
+]  # example from https://en.wikipedia.org/wiki/Alan_Turing
+
+
 class FewShotTestModelClient(ChatBaseModel):
     def run(self, question: str, **kwargs) -> list[str]:
-        input_ = constant.TEST_MSG_HISTORY + [
+        input_ = TEST_MSG_HISTORY + [
             ChatCompletionUserMessageParam(
                 content=question,
                 role="user",
