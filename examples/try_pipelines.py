@@ -60,10 +60,6 @@ if __name__ == "__main__":
                 ),
                 evaluator=PromptLeakEvaluator(sys_prompt=sys_prompt),
             ),
-            PipeLine(
-                attacker=JailBreaker(model=TestModelClient()),
-                evaluator=JailBreakEvaluator(),
-            ),
         ]
     )
     report = pipelines(
