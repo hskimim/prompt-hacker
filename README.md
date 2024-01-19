@@ -204,5 +204,11 @@ report = pipelines(
     ]
 )
 print(report)
-# {'jailbreak': Evaluation(score=0.0), 'extract_train': Evalution(score=1.0), 'inject': Evaluation(score=0.7), 'leak': Evaluation(score=0.42)}
+# {
+#     "jailbreak": Evaluation(score=0.09090909090909091),
+#     "extract_train": Evaluation(score=0.016272849728462362),
+#     "inject": Evaluation(score=0.8),
+#     "leak": Evaluation(score=0.38),
+# }
+
 ```
