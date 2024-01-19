@@ -21,7 +21,7 @@ class TrainingExtractScore(TrainingDataExtractResult):
 class TrainingExtractInputs(BaseModel):
     prefix_samples: list[str]
     sample_size: int = 50
-    verbose: bool = False
+    verbose: bool = True
 
     def __str__(self) -> str:
         return "extract_train"
@@ -77,8 +77,8 @@ class JailBreakScore(JailBreakResult):
 
 class JailBreakInputs(BaseModel):
     sample_size: int | None = 10
-    shuffle: bool = False
-    verbose: bool = False
+    shuffle: bool = True
+    verbose: bool = True
 
     def __str__(self) -> str:
         return "jailbreak"
