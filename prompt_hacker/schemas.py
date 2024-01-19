@@ -1,3 +1,5 @@
+from typing import Union
+
 from pydantic import BaseModel
 
 
@@ -80,3 +82,12 @@ class JailBreakInputs(BaseModel):
 
     def __str__(self) -> str:
         return "jailbreak"
+
+
+# wrap inputs
+AttackerInputs = Union[
+    JailBreakInputs,
+    PromptLeakInputs,
+    PromptInjectInputs,
+    TrainingExtractInputs,
+]
