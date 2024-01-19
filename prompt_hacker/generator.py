@@ -1,5 +1,5 @@
+import logging
 import time
-import warnings
 
 import pandas as pd
 import requests
@@ -10,11 +10,13 @@ from prompt_hacker.model import OpenAIChatModel
 
 
 class MaliciousGenerator(OpenAIChatModel):
+    """malicious prompt synthetic data generator"""
+
     def __init__(self) -> None:
         super().__init__()
 
     def __call__(
-        self, num_retry: int = 5, tol_time: int = 30, num_prompts: int = 30
+        self, num_retry: int = 3, tol_time: int = 30, num_prompts: int = 30
     ) -> list[str]:
         start_t = time.time()
         for _ in range(num_retry):
@@ -27,7 +29,7 @@ class MaliciousGenerator(OpenAIChatModel):
                     break
                 continue
             return [i.strip() for i in result]
-        warnings.warn(
+        logging.warning(
             """Failed to create malicious prompt. It appears to be due to OpenAI's policy.
               pre-prepared examples will be returned in this time.
               """
@@ -36,6 +38,8 @@ class MaliciousGenerator(OpenAIChatModel):
 
 
 class JailBreakGenerator(OpenAIChatModel):
+    """jailbreak prefix prompt synthetic data generator"""
+
     def __init__(self) -> None:
         super().__init__()
         self._jailbreakers = self._crawl_jailbreakers()
@@ -65,6 +69,8 @@ class JailBreakGenerator(OpenAIChatModel):
 
 
 class SystemPromptGenerator(OpenAIChatModel):
+    """random system message synthetic data generator"""
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -115,7 +121,7 @@ class TemperatureDecaySampling:
 
         augmented_answers: list[str] = []
 
-        for input_ in concated_inputs_:
+        for input_ in concated_inputs_:  # TODO : make it async
             answer: str = self.model.run(
                 question=input_,
                 temperature=self.temperature,
