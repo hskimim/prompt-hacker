@@ -78,11 +78,12 @@ class JailBreaker(Attacker):
             except KeyboardInterrupt:
                 return result
             except Exception:
-                print(
-                    f"""there was error during model api call.
-                    prompt : {prompt}
-                    question : {question}"""
-                )
+                continue
+                # print(
+                #     f"""there was error during model api call.
+                #     prompt : {prompt}
+                #     question : {question}"""
+                # )
         return result
 
 
