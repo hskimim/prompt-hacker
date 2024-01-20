@@ -41,7 +41,7 @@ class PromptInjector(Attacker[PromptInjectAttackResult]):
         return MODEL_NM
 
     @override
-    def run(self) -> PromptInjectAttackResult:
+    def run(self, model: ChatBaseModel) -> PromptInjectAttackResult:
         generated_prompts = self.sys_generator(num_examples=self.inputs.sample_size)
         iters = (
             tqdm(generated_prompts, desc=MODEL_NM)
@@ -52,7 +52,7 @@ class PromptInjector(Attacker[PromptInjectAttackResult]):
             results = [
                 PromptInjectAttackResult.Result(
                     injected_prompt=injected_sys_prompt,
-                    answer=self.model.run( question=PROMPT.format(new_instruction=injected_sys_prompt))[0]) # TODO: fix unknown member type
+                    answer=model.run( question=PROMPT.format(new_instruction=injected_sys_prompt))[0]) # TODO: fix unknown member type
                 for injected_sys_prompt in iters  # type:ignore 
             ]
         )

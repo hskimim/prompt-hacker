@@ -16,7 +16,7 @@ class EmbedBaseModel(Protocol):
 
 class Attacker(Protocol[T_ATTACK_RESULT_co]):
     @abstractmethod
-    def run(self) -> T_ATTACK_RESULT_co:
+    def run(self, model: ChatBaseModel) -> T_ATTACK_RESULT_co:
         pass
 
 
