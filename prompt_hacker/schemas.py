@@ -1,20 +1,32 @@
-from abc import ABC
-from typing import Union
+from typing import List, Protocol, TypeVar, Union
+from typing_extensions import override
 
 from pydantic import BaseModel
 
 
 # general
-class Evaluation(BaseModel):
+class AttackResult(Protocol):
+    pass
+
+
+T_ATTACK_RESULT_co = TypeVar("T_ATTACK_RESULT_co", bound=AttackResult, covariant=True)
+T_ATTACK_RESULT_con = TypeVar("T_ATTACK_RESULT_con", bound=AttackResult, contravariant=True)
+
+
+class EvaluationResult(Protocol):
     score: float
 
 
-class AttackResult(ABC):
-    pass
+T_EVALUATION_RESULT = TypeVar("T_EVALUATION_RESULT", bound=EvaluationResult)
+
+
+class EvaluationSummary(BaseModel):
+    score: float
 
 
 # extract_train
 class TrainingDataExtractModel(BaseModel):
+    @override
     def __str__(self) -> str:
         return "extract_train"
 
@@ -36,17 +48,9 @@ class TrainingExtractInputs(TrainingDataExtractModel):
 
 # inject
 class PromptInjectModel(BaseModel):
+    @override
     def __str__(self) -> str:
         return "inject"
-
-
-class PromptInjectResult(AttackResult, PromptInjectModel):
-    injected_prompt: str
-    answer: str
-
-
-class PromptInjectScore(PromptInjectResult):
-    score: float
 
 
 class PromptInjectInputs(PromptInjectModel):
@@ -54,8 +58,27 @@ class PromptInjectInputs(PromptInjectModel):
     verbose: bool = True
 
 
+class PromptInjectAttackResult(PromptInjectModel, AttackResult): 
+    results: List['PromptInjectAttackResult.Result']
+
+    class Result(PromptInjectModel):
+        injected_prompt: str
+        answer: str
+
+
+class PromptInjectEvaulationResult(PromptInjectModel, EvaluationResult):
+    score: float
+    results: List['PromptInjectEvaulationResult.Result']
+
+    class Result(PromptInjectModel, EvaluationResult):
+        score: float
+        attack: PromptInjectAttackResult.Result
+        
+    
+
 # leak
 class PromptLeakModel(BaseModel):
+    @override
     def __str__(self) -> str:
         return "leak"
 
@@ -76,6 +99,7 @@ class PromptLeakInputs(PromptLeakModel):
 
 # jailbreak
 class JailBreakModel(BaseModel):
+    @override
     def __str__(self) -> str:
         return "jailbreak"
 
