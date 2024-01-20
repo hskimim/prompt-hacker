@@ -187,10 +187,6 @@ pipelines = CompositePipeLine(
             ),
             evaluator=PromptLeakEvaluator(sys_prompt=sys_prompt),
         ),
-        PipeLine(
-            attacker=JailBreaker(model=TestModelClient()),
-            evaluator=JailBreakEvaluator(),
-        ),
     ]
 )
 report = pipelines(
