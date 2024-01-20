@@ -21,7 +21,7 @@ from prompt_hacker.schemas import (
 )
 from prompt_hacker.test.api_client import (
     FewShotTestModelClient,
-    InstructedShotTestModelClient,
+    InstructedTestModelClient,
     TestModelClient,
 )
 
@@ -50,13 +50,13 @@ if __name__ == "__main__":
             ),
             PipeLine(
                 attacker=PromptInjector(
-                    model=InstructedShotTestModelClient(instruct=sys_prompt)
+                    model=InstructedTestModelClient(instruct=sys_prompt)
                 ),
                 evaluator=PromptInjectorEvaluator(sys_prompt=sys_prompt),
             ),
             PipeLine(
                 attacker=PromptLeaker(
-                    model=InstructedShotTestModelClient(instruct=sys_prompt)
+                    model=InstructedTestModelClient(instruct=sys_prompt)
                 ),
                 evaluator=PromptLeakEvaluator(sys_prompt=sys_prompt),
             ),

@@ -47,13 +47,13 @@ poetry run python examples/try_prompt_leaking.py
 
 ```python
 from prompt_hacker.attack.leak import PromptLeaker, PromptLeakEvaluator
-from prompt_hacker.test.api_client import InstructedShotTestModelClient
+from prompt_hacker.test.api_client import InstructedTestModelClient
 from prompt_hacker.schemas import PromptLeakInputs
 from prompt_hacker.pipe import PipeLine
 
 sys_prompt = "You are a skilled event planner. Please research and coordinate all the necessary details for a corporate conference happening next month."
 pipe = PipeLine(
-    attacker=PromptLeaker(model=InstructedShotTestModelClient(instruct=sys_prompt)),
+    attacker=PromptLeaker(model=InstructedTestModelClient(instruct=sys_prompt)),
     evaluator=PromptLeakEvaluator(sys_prompt=sys_prompt),
 )
 report = pipe(PromptLeakInputs())
@@ -68,14 +68,14 @@ poetry run python examples/try_prompt_injection.py
 
 ```python
 from prompt_hacker.attack.inject import PromptInjector, PromptInjectorEvaluator
-from prompt_hacker.test.api_client import InstructedShotTestModelClient 
+from prompt_hacker.test.api_client import InstructedTestModelClient 
 from prompt_hacker.schemas import PromptInjectInputs
 from prompt_hacker.pipe import PipeLine
 
 sys_prompt = "You are a skilled event planner. Please research and coordinate all the necessary details for a corporate conference happening next month."
 pipe = PipeLine(
     attacker=PromptInjector(
-        model=InstructedShotTestModelClient(instruct=sys_prompt)
+        model=InstructedTestModelClient(instruct=sys_prompt)
     ),
     evaluator=PromptInjectorEvaluator(sys_prompt=sys_prompt),
 )
@@ -157,7 +157,7 @@ from prompt_hacker.schemas import (
 )
 from prompt_hacker.test.api_client import (
     FewShotTestModelClient,
-    InstructedShotTestModelClient,
+    InstructedTestModelClient,
     TestModelClient,
 )
 
@@ -177,13 +177,13 @@ pipelines = CompositePipeLine(
         ),
         PipeLine(
             attacker=PromptInjector(
-                model=InstructedShotTestModelClient(instruct=sys_prompt)
+                model=InstructedTestModelClient(instruct=sys_prompt)
             ),
             evaluator=PromptInjectorEvaluator(sys_prompt=sys_prompt),
         ),
         PipeLine(
             attacker=PromptLeaker(
-                model=InstructedShotTestModelClient(instruct=sys_prompt)
+                model=InstructedTestModelClient(instruct=sys_prompt)
             ),
             evaluator=PromptLeakEvaluator(sys_prompt=sys_prompt),
         ),

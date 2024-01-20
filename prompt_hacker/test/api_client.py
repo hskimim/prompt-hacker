@@ -73,7 +73,7 @@ class FewShotTestModelClient(ChatBaseModel):
         ]
 
 
-class InstructedShotTestModelClient(ChatBaseModel):
+class InstructedTestModelClient(ChatBaseModel):
     def __init__(self, instruct) -> None:
         super().__init__()
         self.instruct = instruct
