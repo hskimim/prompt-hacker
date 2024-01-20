@@ -19,3 +19,6 @@ class Attacker(Protocol):
 class Evaluator(Protocol):
     def evaluate(self, *args, **kwargs):
         pass
+
+    def summary(self, *args, **kwargs):
+        pass
