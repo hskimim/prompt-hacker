@@ -31,8 +31,17 @@ class CompositePipeLine:
     ) -> dict[str, AttackerInputs]:
         return {str(input_): input_ for input_ in inputs}
 
+    def _validate_inputs(self, input_dict: dict[str, AttackerInputs]) -> None:
+        missed_input: set[str] = set([str(pipe) for pipe in self._pipelines]) - set(
+            list(input_dict.keys())
+        )
+        if len(missed_input):
+            raise ValueError(f"there is missed input for {missed_input} component(s)")
+
     def __call__(self, inputs: list[AttackerInputs]) -> dict[str, Evaluation]:
         input_dict = self._convert_inputs_to_input_dict(inputs)
+        self._validate_inputs(input_dict)
+
         return {
             str(pipe): pipe(input_dict[str(pipe)]) for pipe in self._pipelines
         }  # TODO : make it async
