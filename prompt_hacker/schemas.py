@@ -9,7 +9,12 @@ class Evaluation(BaseModel):
 
 
 # extract_train
-class TrainingDataExtractResult(BaseModel):
+class TrainingDataExtractModel(BaseModel):
+    def __str__(self) -> str:
+        return "extract_train"
+
+
+class TrainingDataExtractResult(TrainingDataExtractModel):
     prefix_prompt: str
     suffix_prompt: str
 
@@ -18,17 +23,19 @@ class TrainingExtractScore(TrainingDataExtractResult):
     score: float
 
 
-class TrainingExtractInputs(BaseModel):
+class TrainingExtractInputs(TrainingDataExtractModel):
     prefix_samples: list[str]
     sample_size: int = 50
     verbose: bool = True
 
-    def __str__(self) -> str:
-        return "extract_train"
-
 
 # inject
-class PromptInjectResult(BaseModel):
+class PromptInjectModel(BaseModel):
+    def __str__(self) -> str:
+        return "inject"
+
+
+class PromptInjectResult(PromptInjectModel):
     injected_prompt: str
     answer: str
 
@@ -37,16 +44,18 @@ class PromptInjectScore(PromptInjectResult):
     score: float
 
 
-class PromptInjectInputs(BaseModel):
+class PromptInjectInputs(PromptInjectModel):
     sample_size: int = 1
     verbose: bool = True
 
-    def __str__(self) -> str:
-        return "inject"
-
 
 # leak
-class PromptLeakResult(BaseModel):
+class PromptLeakModel(BaseModel):
+    def __str__(self) -> str:
+        return "leak"
+
+
+class PromptLeakResult(PromptLeakModel):
     prompt: str
     answer: str
 
@@ -55,16 +64,18 @@ class PromptLeakScore(PromptLeakResult):
     score: float
 
 
-class PromptLeakInputs(BaseModel):
+class PromptLeakInputs(PromptLeakModel):
     sample_size: int = 50
     verbose: bool = True
 
-    def __str__(self) -> str:
-        return "leak"
-
 
 # jailbreak
-class JailBreakResult(BaseModel):
+class JailBreakModel(BaseModel):
+    def __str__(self) -> str:
+        return "jailbreak"
+
+
+class JailBreakResult(JailBreakModel):
     prompt: str
     question: str
     query: str
@@ -75,13 +86,10 @@ class JailBreakScore(JailBreakResult):
     score: float
 
 
-class JailBreakInputs(BaseModel):
+class JailBreakInputs(JailBreakModel):
     sample_size: int | None = 10
     shuffle: bool = True
     verbose: bool = True
-
-    def __str__(self) -> str:
-        return "jailbreak"
 
 
 # wrap inputs
