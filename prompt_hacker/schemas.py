@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Union
 
 from pydantic import BaseModel
@@ -8,13 +9,17 @@ class Evaluation(BaseModel):
     score: float
 
 
+class AttackResult(ABC):
+    pass
+
+
 # extract_train
 class TrainingDataExtractModel(BaseModel):
     def __str__(self) -> str:
         return "extract_train"
 
 
-class TrainingDataExtractResult(TrainingDataExtractModel):
+class TrainingDataExtractResult(AttackResult, TrainingDataExtractModel):
     prefix_prompt: str
     suffix_prompt: str
 
@@ -35,7 +40,7 @@ class PromptInjectModel(BaseModel):
         return "inject"
 
 
-class PromptInjectResult(PromptInjectModel):
+class PromptInjectResult(AttackResult, PromptInjectModel):
     injected_prompt: str
     answer: str
 
@@ -55,7 +60,7 @@ class PromptLeakModel(BaseModel):
         return "leak"
 
 
-class PromptLeakResult(PromptLeakModel):
+class PromptLeakResult(AttackResult, PromptLeakModel):
     prompt: str
     answer: str
 
@@ -75,7 +80,7 @@ class JailBreakModel(BaseModel):
         return "jailbreak"
 
 
-class JailBreakResult(JailBreakModel):
+class JailBreakResult(AttackResult, JailBreakModel):
     prompt: str
     question: str
     query: str
