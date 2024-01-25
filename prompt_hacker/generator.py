@@ -1,3 +1,4 @@
+import base64
 import logging
 import time
 
@@ -7,6 +8,7 @@ import requests
 from prompt_hacker import constant, prompts
 from prompt_hacker.interface import ChatBaseModel
 from prompt_hacker.model import OpenAIChatModel
+from prompt_hacker.prompts import JailBreakModelPrompts
 
 
 class MaliciousGenerator(OpenAIChatModel):
@@ -146,3 +148,25 @@ class TemperatureDecaySampling:
             augmented_answers.append(concat_answer)
 
         return list(set(augmented_answers))
+
+
+class JailBreakAttackPromptGenerator:
+    def __init__(self) -> None:
+        for prompt in JailBreakModelPrompts:
+            self._validate_prompt_form(prompt.value)
+
+    @staticmethod
+    def _validate_prompt_form(prompt: str):
+        if "{PROMPT}" in prompt or "{BASE64}" in prompt:
+            raise ValueError("{PROMPT} | {BASE64} should be in prompt")
+
+    def __call__(self) -> dict[str, str]:
+        return {prompt.name: prompt.value for prompt in JailBreakModelPrompts}
+
+
+class Base64Convertor:
+    def encode(self, plain_txt: str) -> str:
+        return base64.b64encode(plain_txt.encode("UTF-8")).decode("utf-8")
+
+    def decode(self, encoded: str) -> str:
+        return base64.b64decode(encoded.encode("ascii")).decode("UTF-8")
