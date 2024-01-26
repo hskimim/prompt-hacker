@@ -30,3 +30,26 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff.lint]
 ignore = ["E402"]
+
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.pyright]
+# this enables practically every flag given by pyright.
+# there are a couple of flags that are still disabled by
+# default in strict mode as they are experimental and niche.
+typeCheckingMode = "strict"
+pythonVersion = "3.11"
+
+exclude = [
+    "_dev",
+    ".venv",
+    ".nox",
+]
+
+reportImplicitOverride = true
+
+reportImportCycles = false
+reportPrivateUsage = false

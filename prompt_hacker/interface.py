@@ -1,4 +1,7 @@
+from abc import abstractmethod
 from typing import Protocol
+
+from prompt_hacker.schemas import T_EVALUATION_RESULT, EvaluationSummary, T_ATTACK_RESULT_co, T_ATTACK_RESULT_con
 
 
 class ChatBaseModel(Protocol):
@@ -11,14 +14,17 @@ class EmbedBaseModel(Protocol):
         ...
 
 
-class Attacker(Protocol):
-    def run(self, *args, **kwargs):
+class Attacker(Protocol[T_ATTACK_RESULT_co]):
+    @abstractmethod
+    def run(self, model: ChatBaseModel) -> T_ATTACK_RESULT_co:
         pass
 
 
-class Evaluator(Protocol):
-    def evaluate(self, *args, **kwargs):
+class Evaluator(Protocol[T_ATTACK_RESULT_con, T_EVALUATION_RESULT]):
+    @abstractmethod
+    def evaluate(self, result: T_ATTACK_RESULT_con) -> T_EVALUATION_RESULT:
         pass
 
-    def summary(self, *args, **kwargs):
+    @abstractmethod
+    def summary(self, result: T_EVALUATION_RESULT) -> EvaluationSummary:
         pass
