@@ -1,76 +1,6 @@
-import base64
-import logging
-import time
-
-import pandas as pd
-import requests
-
 from prompt_hacker import constant, prompts
 from prompt_hacker.interface import ChatBaseModel
 from prompt_hacker.model import OpenAIChatModel
-from prompt_hacker.prompts import JailBreakModelPrompts
-
-
-class MaliciousGenerator(OpenAIChatModel):
-    """malicious prompt synthetic data generator"""
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def __call__(
-        self, num_retry: int = 3, tol_time: int = 30, num_prompts: int = 30
-    ) -> list[str]:
-        start_t = time.time()
-        for proc in range(num_retry):
-            result = self._generate(
-                question=prompts.malicious_generator(
-                    num_prompts,
-                    PigLatinGenerator()(word="malicious") if proc else None,
-                ),  # type:ignore
-                temperature=1.5,
-            )[0][0].split(constant.PROMPT_SEPERATOR)[0]
-            if len(result) < num_prompts / 10:
-                if time.time() - start_t > tol_time:
-                    break
-                continue
-            return [i.strip() for i in result]
-        logging.warning(
-            """Failed to create malicious prompt. It appears to be due to OpenAI's policy.
-              pre-prepared examples will be returned in this time.
-              """
-        )
-        return constant.MALICIOUS_PROMPTS
-
-
-class JailBreakGenerator(OpenAIChatModel):
-    """jailbreak prefix prompt synthetic data generator"""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._jailbreakers = self._crawl_jailbreakers()
-
-    def _crawl_jailbreakers(self) -> list[str]:
-        res = requests.get(constant.JAILBREAKCHAT_URL)
-        df = pd.DataFrame(res.json())
-        df["votes"] = df.upvotes - df.downvotes
-        df = df[df["votes"] > 0]  # filtering with its vote
-        df["text"] = df["text"].str.replace(constant.QUERY_LOC, "{query}")
-        df.sort_values("votes", ascending=False, inplace=True)
-        return df["text"].values.tolist()
-
-    def _load_examples(self, num_examples: int) -> list[str]:
-        ls = self._jailbreakers[:num_examples]
-        for idx, val in enumerate(ls):
-            ls[idx] = f"{idx+1}. {val}"
-        return ls
-
-    def __call__(self, num_examples: int = 5) -> list[str]:
-        query = prompts.synthetic_prompt_generator(self._load_examples(num_examples))
-        return self._generate(query)[0].split(constant.PROMPT_SEPERATOR)
-
-    @property
-    def jailbreak_prompt_list(self):
-        return self._jailbreakers
 
 
 class SystemPromptGenerator(OpenAIChatModel):
@@ -150,23 +80,6 @@ class TemperatureDecaySampling:
         return list(set(augmented_answers))
 
 
-class JailBreakAttackPromptGenerator:
-    def __init__(self) -> None:
-        for prompt in JailBreakModelPrompts:
-            self._validate_prompt_form(prompt.value)
-
-    @staticmethod
-    def _validate_prompt_form(prompt: str):
-        if "{PROMPT}" in prompt or "{BASE64}" in prompt:
-            raise ValueError("{PROMPT} | {BASE64} should be in prompt")
-
-    def __call__(self) -> dict[str, str]:
-        return {prompt.name: prompt.value for prompt in JailBreakModelPrompts}
-
-
-class Base64Convertor:
-    def encode(self, plain_txt: str) -> str:
-        return base64.b64encode(plain_txt.encode("UTF-8")).decode("utf-8")
-
-    def decode(self, encoded: str) -> str:
-        return base64.b64decode(encoded.encode("ascii")).decode("UTF-8")
+class DisemvowelDecoder(OpenAIChatModel):
+    def decode(self, text: str) -> str:
+        return self._generate(prompts.disemvowel_decode_prompt(text))[0]
