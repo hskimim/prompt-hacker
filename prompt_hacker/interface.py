@@ -22,3 +22,11 @@ class Evaluator(Protocol):
 
     def summary(self, *args, **kwargs):
         pass
+
+
+class StringConverter(Protocol):
+    def encode(self, string: str) -> str:
+        ...
+
+    def decode(self, encoded: str) -> str:
+        ...
