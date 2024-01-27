@@ -20,14 +20,14 @@ class OpenAIChatModel(ChatBaseModel):
             **kwargs,
             model=constant.MODEL_NM,
             messages=question,
-        )
+        )  # type:ignore
 
         msg = response.choices[0].message.content
         return [msg]
 
     def run(self, question: str, **kwargs) -> list[str]:
         input_ = [{"role": "user", "content": question}]
-        return self._generate(input_, **kwargs)
+        return self._generate(input_, **kwargs)  # type:ignore
 
 
 class OpenAIEmbedModel(EmbedBaseModel):
