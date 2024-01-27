@@ -1,12 +1,8 @@
-import random
-from copy import copy
-from itertools import product
-
 from tqdm import tqdm
 
 from prompt_hacker import constant, utils
-from prompt_hacker.generator import JailBreakGenerator, MaliciousGenerator
 from prompt_hacker.interface import Attacker, ChatBaseModel, Evaluator
+from prompt_hacker.loader.jailbreak import JailBreakLoader
 from prompt_hacker.model import OpenAIEmbedModel
 from prompt_hacker.schemas import (
     Evaluation,
@@ -21,53 +17,28 @@ MODEL_NM = "jailbreak"
 class JailBreaker(Attacker):
     def __init__(self, model: ChatBaseModel) -> None:
         self._model = model
-        self._jb = JailBreakGenerator()
-        self._mal = MaliciousGenerator()
+        self._loader = JailBreakLoader()
 
     def __str__(self) -> str:
         return MODEL_NM
 
-    def _prepare_prompts(
-        self,
-        sample_size: int | None,
-        verbose: bool,
-        shuffle: bool,
-    ) -> product | tqdm:
-        prompts = copy(self._jb.jailbreak_prompt_list)
-        questions = copy(self._mal())
-        if shuffle:
-            random.shuffle(prompts)
-            random.shuffle(questions)
-        iters = list(product(prompts, questions))
-        total_len = int(len(prompts) * len(questions))
-        iters = (
-            tqdm(
-                iters,
-                total=sample_size if sample_size else total_len,
-                desc=MODEL_NM,
-            )  # type: ignore
-            if verbose  # type: ignore
-            else iters  # type: ignore
-        )
-        return iters  # type: ignore
-
     def run(self, inputs: JailBreakInputs) -> list[JailBreakResult]:
-        iters = self._prepare_prompts(
-            inputs.sample_size,
-            inputs.verbose,
-            inputs.shuffle,
-        )
         result = []
         cnt = 0
-        for prompt, question in iters:  # type: ignore
+        for data in (
+            tqdm(
+                self._loader,
+                total=inputs.sample_size if inputs.sample_size else len(self._loader),
+                desc=MODEL_NM,
+            )  # type:ignore
+            if inputs.verbose
+            else self._loader
+        ):
             try:
-                query = prompt.format(query=question)
-                answer = self._model.run(query)[0]
+                answer = self._model.run(data["question"])[0]
                 result.append(
                     JailBreakResult(
-                        prompt=prompt,
-                        question=question,
-                        query=query,
+                        **data,
                         answer=answer,
                     )
                 )
@@ -79,11 +50,6 @@ class JailBreaker(Attacker):
                 return result
             except Exception:
                 continue
-                # print(
-                #     f"""there was error during model api call.
-                #     prompt : {prompt}
-                #     question : {question}"""
-                # )
         return result
 
 

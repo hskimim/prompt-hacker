@@ -76,10 +76,17 @@ class JailBreakModel(BaseModel):
 
 
 class JailBreakResult(JailBreakModel):
-    prompt: str
-    question: str
-    query: str
+    malicious_name: str
+    malicious_tag: str
+    malicious_prompt: str
+    attack_name: str
+    attack_prompt: str
     answer: str
+
+    # prompt: str
+    # question: str
+    # query: str
+    # answer: str
 
 
 class JailBreakScore(JailBreakResult):
@@ -88,7 +95,6 @@ class JailBreakScore(JailBreakResult):
 
 class JailBreakInputs(JailBreakModel):
     sample_size: int | None = 10
-    shuffle: bool = True
     verbose: bool = True
 
 
