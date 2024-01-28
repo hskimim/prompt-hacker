@@ -102,7 +102,8 @@ class JailBreakLoader:
 
     def __iter__(self) -> dict[str, str]:
         for prompt, jailbreak in itertools.product(
-            self._malicious_prompt_loader.load(), self._jailbreak_prompts_loader.load()
+            self._malicious_prompt_loader.load(),
+            self._jailbreak_prompts_loader.load(),
         ):
             data = {**prompt, **jailbreak}
             query = data["malicious_prompt"]
