@@ -1,5 +1,4 @@
-import logging
-import time
+from typing import List
 
 import pandas as pd
 import requests
@@ -14,29 +13,30 @@ class MaliciousGenerator(OpenAIChatModel):
 
     def __init__(self) -> None:
         super().__init__()
+        self._generator = PigLatinGenerator()
 
-    def __call__(
-        self, num_retry: int = 3, tol_time: int = 30, num_prompts: int = 30
-    ) -> list[str]:
-        start_t = time.time()
-        for proc in range(num_retry):
-            result = self._generate(
-                question=prompts.malicious_generator(
-                    num_prompts,
-                    PigLatinGenerator()(word="malicious") if proc else None,
-                ),  # type:ignore
-                temperature=1.5,
-            )[0][0].split(constant.PROMPT_SEPERATOR)[0]
-            if len(result) < num_prompts / 10:
-                if time.time() - start_t > tol_time:
-                    break
-                continue
-            return [i.strip() for i in result]
-        logging.warning(
-            """Failed to create malicious prompt. It appears to be due to OpenAI's policy.
-              pre-prepared examples will be returned in this time.
-              """
-        )
+    def __call__(self, num_retry: int = 3, tol_time: int = 30, num_prompts: int = 30) -> list[str]:
+        # TODO: implement this method
+        # start_t = time.time()
+        # for proc in range(num_retry):
+        #     malicious_prompts = prompts.malicious_generator(
+        #         num_prompts, self._generator(word="malicious") if proc else None
+        #     )
+
+        #     if not malicious_prompts:
+        #         continue
+
+        #     result = self._generate(malicious_prompts).split(constant.PROMPT_SEPERATOR)
+        #     if len(result) < num_prompts / 10:
+        #         if time.time() - start_t > tol_time:
+        #             break
+        #         continue
+        #     return [i.strip() for i in result]
+        # logging.warning(
+        #     """Failed to create malicious prompt. It appears to be due to OpenAI's policy.
+        #       pre-prepared examples will be returned in this time.
+        #       """
+        # )
         return constant.MALICIOUS_PROMPTS
 
 
@@ -62,9 +62,9 @@ class JailBreakGenerator(OpenAIChatModel):
             ls[idx] = f"{idx+1}. {val}"
         return ls
 
-    def __call__(self, num_examples: int = 5) -> list[str]:
+    def __call__(self, num_examples: int = 5) -> List[str]:
         query = prompts.synthetic_prompt_generator(self._load_examples(num_examples))
-        return self._generate(query)[0].split(constant.PROMPT_SEPERATOR)
+        return self._generate(query).split(constant.PROMPT_SEPERATOR)
 
     @property
     def jailbreak_prompt_list(self):
@@ -77,9 +77,9 @@ class SystemPromptGenerator(OpenAIChatModel):
     def __init__(self) -> None:
         super().__init__()
 
-    def __call__(self, num_examples: int = 5) -> list[str]:
+    def __call__(self, num_examples: int = 5) -> List[str]:
         query = prompts.system_prompt_generator(num_prompts=num_examples)
-        return self._generate(query)[0].split(constant.PROMPT_SEPERATOR)
+        return self._generate(query).split(constant.PROMPT_SEPERATOR)
 
 
 class PigLatinGenerator(OpenAIChatModel):
@@ -90,7 +90,7 @@ class PigLatinGenerator(OpenAIChatModel):
 
     def __call__(self, word: str) -> str:
         query = prompts.pig_latin_generator(word)
-        return self._generate(query)[0]
+        return self._generate(query)
 
 
 class TemperatureDecaySampling:
@@ -116,33 +116,36 @@ class TemperatureDecaySampling:
         self,
         init_question: str,
     ) -> list[str]:
-        high_temp_seq_length = int(self.max_tokens * self.temperature_ratio)
-        messages: list[str] = self.model.run(
-            question=init_question,
-            temperature=self.temperature,
-            n=self.sample_size,
-            max_tokens=high_temp_seq_length,
-        )
-        # concat input + output
-        concated_inputs_ = [init_question + msg for msg in messages]
+        # TODO: fix this
+        raise NotImplementedError("")
 
-        self.temperature = 1
-        self.max_tokens = self.max_tokens - high_temp_seq_length
-        self.sample_size = 1
+        # high_temp_seq_length = int(self.max_tokens * self.temperature_ratio)
+        # messages: list[str] = self.model.run(
+        #     question=init_question,
+        #     temperature=self.temperature,
+        #     n=self.sample_size,
+        #     max_tokens=high_temp_seq_length,
+        # )
+        # # concat input + output
+        # concated_inputs_ = [init_question + msg for msg in messages]
 
-        if self.max_tokens == 0:
-            return concated_inputs_
+        # self.temperature = 1
+        # self.max_tokens = self.max_tokens - high_temp_seq_length
+        # self.sample_size = 1
 
-        augmented_answers: list[str] = []
+        # if self.max_tokens == 0:
+        #     return concated_inputs_
 
-        for input_ in concated_inputs_:  # TODO : make it async
-            answer: str = self.model.run(
-                question=input_,
-                temperature=self.temperature,
-                n=self.sample_size,
-                max_tokens=high_temp_seq_length,
-            )[0]
-            concat_answer = input_ + answer  # concat input + output
-            augmented_answers.append(concat_answer)
+        # augmented_answers: list[str] = []
 
-        return list(set(augmented_answers))
+        # for input_ in concated_inputs_:  # TODO : make it async
+        #     answer: str = self.model.run(
+        #         question=input_,
+        #         temperature=self.temperature,
+        #         n=self.sample_size,
+        #         max_tokens=high_temp_seq_length,
+        #     )[0]
+        #     concat_answer = input_ + answer  # concat input + output
+        #     augmented_answers.append(concat_answer)
+
+        # return list(set(augmented_answers))
