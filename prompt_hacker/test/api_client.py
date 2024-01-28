@@ -18,9 +18,7 @@ class TestModelClient(ChatBaseModel):
         self._client = OpenAI()
 
     def run(self, question: str, **kwargs) -> list[str]:
-        input_: list[ChatCompletionMessageParam] = [
-            {"role": "user", "content": question}
-        ]
+        input_: list[ChatCompletionMessageParam] = [{"role": "user", "content": question}]
         response = self._client.chat.completions.create(
             model="gpt-3.5-turbo",
             temperature=0.9,
@@ -66,15 +64,11 @@ class FewShotTestModelClient(ChatBaseModel):
             **kwargs,
         )
 
-        return [
-            choice.message.content
-            for choice in response.choices
-            if choice.message.content
-        ]
+        return [choice.message.content for choice in response.choices if choice.message.content]
 
 
 class InstructedTestModelClient(ChatBaseModel):
-    def __init__(self, instruct) -> None:
+    def __init__(self, instruct: str) -> None:
         super().__init__()
         self.instruct = instruct
 
@@ -96,8 +90,4 @@ class InstructedTestModelClient(ChatBaseModel):
             **kwargs,
         )
 
-        return [
-            choice.message.content
-            for choice in response.choices
-            if choice.message.content
-        ]
+        return [choice.message.content for choice in response.choices if choice.message.content]
