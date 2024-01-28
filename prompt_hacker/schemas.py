@@ -1,11 +1,11 @@
-from typing import List, Protocol, TypeVar, Union
+from typing import List, TypeVar
 from typing_extensions import override
 
 from pydantic import BaseModel
 
 
 # general
-class AttackResult(Protocol):
+class AttackResult(BaseModel):
     pass
 
 
@@ -13,7 +13,7 @@ T_ATTACK_RESULT_co = TypeVar("T_ATTACK_RESULT_co", bound=AttackResult, covariant
 T_ATTACK_RESULT_con = TypeVar("T_ATTACK_RESULT_con", bound=AttackResult, contravariant=True)
 
 
-class EvaluationResult(Protocol):
+class EvaluationResult(BaseModel):
     score: float
 
 
@@ -31,50 +31,49 @@ class TrainingDataExtractModel(BaseModel):
         return "extract_train"
 
 
-class TrainingDataExtractResult(AttackResult, TrainingDataExtractModel):
-    prefix_prompt: str
-    suffix_prompt: str
+# class TrainingDataExtractResult(AttackResult, TrainingDataExtractModel):
+#     prefix_prompt: str
+#     suffix_prompt: str
 
 
-class TrainingExtractScore(TrainingDataExtractResult):
-    score: float
+# class TrainingExtractScore(TrainingDataExtractResult):
+#     score: float
 
 
-class TrainingExtractInputs(TrainingDataExtractModel):
-    prefix_samples: list[str]
-    sample_size: int = 50
-    verbose: bool = True
+# class TrainingExtractInputs(TrainingDataExtractModel):
+#     prefix_samples: list[str]
+#     sample_size: int = 50
+#     verbose: bool = True
 
 
 # inject
-class PromptInjectModel(BaseModel):
+class PromptInjectBaseModel(BaseModel):
     @override
     def __str__(self) -> str:
         return "inject"
 
 
-class PromptInjectInputs(PromptInjectModel):
+class PromptInjectInputs(PromptInjectBaseModel):
     sample_size: int = 1
     verbose: bool = True
 
 
-class PromptInjectAttackResult(PromptInjectModel, AttackResult): 
-    results: List['PromptInjectAttackResult.Result']
+class PromptInjectAttackResult(AttackResult):
+    results: List["PromptInjectAttackResult.Result"]
 
-    class Result(PromptInjectModel):
+    class Result(PromptInjectBaseModel):
         injected_prompt: str
         answer: str
 
 
-class PromptInjectEvaulationResult(PromptInjectModel, EvaluationResult):
+class PromptInjectEvaulationResult(EvaluationResult):
     score: float
-    results: List['PromptInjectEvaulationResult.Result']
+    results: List["PromptInjectEvaulationResult.Result"]
 
-    class Result(PromptInjectModel, EvaluationResult):
+    class Result(PromptInjectBaseModel, EvaluationResult):
         score: float
         attack: PromptInjectAttackResult.Result
-        
-    
+
 
 # leak
 class PromptLeakModel(BaseModel):
@@ -83,18 +82,18 @@ class PromptLeakModel(BaseModel):
         return "leak"
 
 
-class PromptLeakResult(AttackResult, PromptLeakModel):
-    prompt: str
-    answer: str
-
-
-class PromptLeakScore(PromptLeakResult):
-    score: float
-
-
-class PromptLeakInputs(PromptLeakModel):
-    sample_size: int = 50
-    verbose: bool = True
+# class PromptLeakResult(AttackResult, PromptLeakModel):
+# prompt: str
+# answer: str
+#
+#
+# class PromptLeakScore(PromptLeakResult):
+# score: float
+#
+#
+# class PromptLeakInputs(PromptLeakModel):
+# sample_size: int = 50
+# verbose: bool = True
 
 
 # jailbreak
@@ -104,27 +103,28 @@ class JailBreakModel(BaseModel):
         return "jailbreak"
 
 
-class JailBreakResult(AttackResult, JailBreakModel):
-    prompt: str
-    question: str
-    query: str
-    answer: str
-
-
-class JailBreakScore(JailBreakResult):
-    score: float
-
-
-class JailBreakInputs(JailBreakModel):
-    sample_size: int | None = 10
-    shuffle: bool = True
-    verbose: bool = True
-
-
+# class JailBreakResult(AttackResult, JailBreakModel):
+# prompt: str
+# question: str
+# query: str
+# answer: str
+#
+#
+# class JailBreakScore(JailBreakResult):
+# score: float
+#
+#
+# class JailBreakInputs(JailBreakModel):
+# sample_size: int | None = 10
+# shuffle: bool = True
+# verbose: bool = True
+#
+#
 # wrap inputs
-AttackerInputs = Union[
-    JailBreakInputs,
-    PromptLeakInputs,
-    PromptInjectInputs,
-    TrainingExtractInputs,
-]
+# AttackerInputs = Union[
+# JailBreakInputs,
+# PromptLeakInputs,
+# PromptInjectInputs,
+# TrainingExtractInputs,
+# ]
+#
