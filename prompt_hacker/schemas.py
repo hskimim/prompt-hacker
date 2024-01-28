@@ -1,5 +1,6 @@
 from typing import Union
 
+import pandas as pd
 from pydantic import BaseModel
 
 
@@ -82,20 +83,22 @@ class JailBreakResult(JailBreakModel):
     attack_name: str
     attack_prompt: str
     answer: str
-
-    # prompt: str
-    # question: str
-    # query: str
-    # answer: str
+    err: bool = False
 
 
 class JailBreakScore(JailBreakResult):
-    score: float
+    label: str
+    confidence: float
 
 
 class JailBreakInputs(JailBreakModel):
     sample_size: int | None = 10
     verbose: bool = True
+
+
+class JailBreakSummary(BaseModel, arbitrary_types_allowed=True):
+    attack_summary: pd.DataFrame
+    tag_summary: pd.DataFrame
 
 
 # wrap inputs
