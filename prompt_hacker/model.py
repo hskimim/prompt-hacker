@@ -21,9 +21,10 @@ class OpenAIChatModel(ChatBaseModel):
             model=constant.MODEL_NM,
             messages=question,
         )  # type:ignore
-
-        msg = response.choices[0].message.content
-        return [msg]
+        if len(response.choices) == 1:
+            return [response.choices[0].message.content]
+        else:
+            return [choice.message.content for choice in response.choices]
 
     def run(self, question: str, **kwargs) -> list[str]:
         input_ = [{"role": "user", "content": question}]
