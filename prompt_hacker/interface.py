@@ -1,16 +1,16 @@
 from abc import abstractmethod
-from typing import Protocol
+from typing import List, Protocol
 
 from prompt_hacker.schemas import T_EVALUATION_RESULT, EvaluationSummary, T_ATTACK_RESULT_co, T_ATTACK_RESULT_con
 
 
 class ChatBaseModel(Protocol):
-    def run(self, question: str, **kwargs) -> list[str]:
+    def run(self, question: str) -> str:
         ...
 
 
 class EmbedBaseModel(Protocol):
-    def run(self, txts: list[str], **kwargs) -> list[list[float]]:
+    def run(self, txt: str) -> List[float]:
         ...
 
 
