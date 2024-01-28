@@ -1,3 +1,5 @@
+from typing import List, Optional
+from typing_extensions import override
 from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam
@@ -11,23 +13,29 @@ load_dotenv(verbose=True)
 class OpenAIChatModel(ChatBaseModel):
     """openai model"""
 
-    def __init__(self) -> None:
+    def __init__(self, client: Optional[OpenAI] = None, prompts: List[ChatCompletionMessageParam] = []) -> None:
         super().__init__()
-        self._client = OpenAI()
+        self._client = client or OpenAI()
+        self._prompts = prompts
 
-    def _generate(self, question: ChatCompletionMessageParam, **kwargs) -> list[str]:
+    @override
+    def run(self, question: str) -> str:
+        return self._generate([{"role": "user", "content": question}])
+
+    def _generate(self, question: List[ChatCompletionMessageParam]) -> str:
         response = self._client.chat.completions.create(
-            **kwargs,
             model=constant.MODEL_NM,
             messages=question,
         )
 
-        msg = response.choices[0].message.content
-        return [msg]
+        content = response.choices[0].message.content
+        if content is None:
+            raise RuntimeError("failed to generate response")
 
-    def run(self, question: str, **kwargs) -> list[str]:
-        input_ = [{"role": "user", "content": question}]
-        return self._generate(input_, **kwargs)
+        return content
+
+    def with_prompts(self, prompts: List[ChatCompletionMessageParam]) -> "OpenAIChatModel":
+        return OpenAIChatModel(client=self._client, prompts=prompts)
 
 
 class OpenAIEmbedModel(EmbedBaseModel):
@@ -35,18 +43,7 @@ class OpenAIEmbedModel(EmbedBaseModel):
         super().__init__()
         self._client = OpenAI()
 
-    def run(self, txts: list[str], **kwargs) -> list[list[float]]:
-        vectors: list[list[float]] = []
-        for answer in txts:
-            try:
-                v: list[float] = (
-                    self._client.embeddings.create(
-                        input=answer, model=constant.EMBEDDING_MODEL_NM
-                    )
-                    .data[0]
-                    .embedding
-                )
-                vectors.append(v)
-            except Exception:
-                print(f"err for {answer}")
-        return vectors
+    @override
+    def run(self, txt: str) -> List[float]:
+        response = self._client.embeddings.create(input=txt, model=constant.EMBEDDING_MODEL_NM)
+        return response.data[0].embedding
