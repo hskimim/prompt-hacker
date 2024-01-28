@@ -3,6 +3,7 @@ import os
 from typing import Any
 
 import numpy as np
+import pandas as pd
 
 
 def calc_jacaard_similarity_for_one_side(compare: str, criteria: str):
@@ -28,3 +29,9 @@ def read_file_with_rel_path(relative_file_path: str) -> Any:
     module_directory = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.normpath(os.path.join(module_directory, relative_file_path))
     return read_json(file_path)
+
+
+def indexing_with_nan(df: pd.DataFrame, colnames: list[Any]) -> pd.DataFrame:
+    transposed_df = df.T
+    transposed_df = transposed_df.reindex(colnames)
+    return transposed_df.T
