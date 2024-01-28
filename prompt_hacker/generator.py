@@ -83,3 +83,20 @@ class TemperatureDecaySampling:
 class DisemvowelDecoder(OpenAIChatModel):
     def decode(self, text: str) -> str:
         return self._generate(prompts.disemvowel_decode_prompt(text))[0]
+
+
+class GoodBotLabeler(OpenAIChatModel):
+    def label(self, question: str, answer: str, sample_size: int = 30) -> list[str]:
+        result = self._generate(
+            prompts.labeling_scheme_prompt(question, answer),
+            n=sample_size,
+        )
+        labels = [i.replace("[", "").replace("]", "") for i in result]
+        labels = [i for i in labels if i in constant.VALID_LABELS]
+
+        return labels
+
+
+class CombinationBase64Decoder(OpenAIChatModel):
+    def decode(self, text: str) -> str:
+        return self._generate(prompts.mixed_base64_decoder(text))[0]

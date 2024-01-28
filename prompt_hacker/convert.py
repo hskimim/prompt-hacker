@@ -3,7 +3,7 @@ import codecs
 import logging
 import random
 
-from prompt_hacker.generator import DisemvowelDecoder
+from prompt_hacker.generator import CombinationBase64Decoder, DisemvowelDecoder
 from prompt_hacker.interface import StringConverter
 
 
@@ -13,6 +13,9 @@ class Base64Convertor:
 
     def decode(self, encoded: str) -> str:
         return base64.b64decode(encoded.encode("ascii")).decode("UTF-8")
+
+    def advanced_decode(self, encoded: str) -> str:
+        return CombinationBase64Decoder().decode(encoded)
 
 
 class Obfuscationer:
@@ -34,7 +37,7 @@ class Obfuscationer:
     def encode(self, string: str) -> str:
         return self.obfuscater.encode(string)
 
-    def decode(self, encoded: str) -> str | None:
+    def decode(self, encoded: str) -> str:
         return self.obfuscater.decode(encoded)
 
 
