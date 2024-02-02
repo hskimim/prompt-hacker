@@ -9,7 +9,7 @@ class PipeLine:
 
         if str(self._attacker) != str(self._evaluator):
             raise ValueError(
-                f"attacker and evaluator is incompatible. we got {str(self._attacker)} attacker but {str(self._evaluator)} in evalutor"
+                f"attacker and evaluator is incompatible. we got {self._attacker!s} attacker but {self._evaluator!s} in evalutor",
             )
 
     def __str__(self) -> str:
@@ -33,7 +33,7 @@ class CompositePipeLine:
 
     def _validate_inputs(self, input_dict: dict[str, AttackerInputs]) -> None:
         missed_input: set[str] = set([str(pipe) for pipe in self._pipelines]) - set(
-            list(input_dict.keys())
+            list(input_dict.keys()),
         )
         if len(missed_input):
             raise ValueError(f"there is missed input for {missed_input} component(s)")
@@ -42,6 +42,4 @@ class CompositePipeLine:
         input_dict = self._convert_inputs_to_input_dict(inputs)
         self._validate_inputs(input_dict)
 
-        return {
-            str(pipe): pipe(input_dict[str(pipe)]) for pipe in self._pipelines
-        }  # TODO : make it async
+        return {str(pipe): pipe(input_dict[str(pipe)]) for pipe in self._pipelines}  # TODO : make it async

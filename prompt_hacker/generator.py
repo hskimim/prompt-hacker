@@ -26,9 +26,7 @@ class PigLatinGenerator(OpenAIChatModel):
 
 
 class TemperatureDecaySampling:
-    """
-    Sampling With A Decaying Temperature' implementation from 'Extracting Training Data from Large Language Models'.
-    """
+    """Sampling With A Decaying Temperature' implementation from 'Extracting Training Data from Large Language Models'."""
 
     def __init__(
         self,

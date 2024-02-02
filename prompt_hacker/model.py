@@ -42,7 +42,8 @@ class OpenAIEmbedModel(EmbedBaseModel):
             try:
                 v: list[float] = (
                     self._client.embeddings.create(
-                        input=answer, model=constant.EMBEDDING_MODEL_NM
+                        input=answer,
+                        model=constant.EMBEDDING_MODEL_NM,
                     )
                     .data[0]
                     .embedding

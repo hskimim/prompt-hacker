@@ -30,7 +30,7 @@ class Obfuscationer:
                 obfuscater = DisemvowelConverter()
             case _:
                 raise ValueError(
-                    "invalid method, choose between {'leetspeak', 'rot13', 'disemvowel'}"
+                    "invalid method, choose between {'leetspeak', 'rot13', 'disemvowel'}",
                 )
         self.obfuscater = obfuscater
 
@@ -48,8 +48,8 @@ class DisemvowelConverter(StringConverter):
         return string
 
     def decode(self, string: str) -> str:
-        logging.warn(
-            "Originally, decoding of disemvowel is not possible. Accordingly, decoding will proceed with prediction through LLM."
+        logging.warning(
+            "Originally, decoding of disemvowel is not possible. Accordingly, decoding will proceed with prediction through LLM.",
         )
         return DisemvowelDecoder().decode(string)
 
@@ -80,7 +80,7 @@ class LeetSpeakConverter(StringConverter):
             "k": [">|", "|<", "/<", "1<", "|c", "|(", "|{"],
             "l": ["1", "7", "|_", "|"],
             "m": ["/\\/\\", "/V\\", "JVI", "[V]", "[]V[]", "|\\/|", "^^"],
-            "n": ["^/", "|\\|", "/\\/", "[\]", "<\\>", "{\\}", "|V", "/V"],
+            "n": ["^/", "|\\|", "/\\/", r"[\]", "<\\>", "{\\}", "|V", "/V"],
             "o": ["0", "Q", "()", "oh", "[]"],
             "p": ["|*", "|o", "?", "|^", "[]D"],
             "q": ["(_,)", "()_", "2", "O_"],
@@ -92,16 +92,13 @@ class LeetSpeakConverter(StringConverter):
             "w": ["\\/\\/", "VV", "\\N", "'//", "\\\\'", "\\^/", "\\X/"],
             "x": ["><", ">|<", "}{", "ecks"],
             "y": ["j", "`/", "\\|/", "\\//"],
-            "z": ["2", "7_", "-/_", "%", ">_", "~/_", "-\_", "-|_"],
+            "z": ["2", "7_", "-/_", "%", ">_", "~/_", r"-\_", "-|_"],
         }
-        self.encoder = {
-            alphabet: random.choice(candidates)
-            for alphabet, candidates in self.char_map.items()
-        }
+        self.encoder = {alphabet: random.choice(candidates) for alphabet, candidates in self.char_map.items()}
 
         decoder = {v: k for k, v in self.encoder.items()}
         self.sorted_decoder = dict(
-            sorted(decoder.items(), key=lambda x: len(x[0]), reverse=True)
+            sorted(decoder.items(), key=lambda x: len(x[0]), reverse=True),
         )
 
     def encode(self, string: str) -> str:
