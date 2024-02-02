@@ -37,12 +37,15 @@ class PromptInjectModel(BaseModel):
 
 
 class PromptInjectResult(PromptInjectModel):
-    injected_prompt: str
+    attack_name: str
+    attack_prompt: str
+    target_string: str
     answer: str
+    err: bool = False
 
 
 class PromptInjectScore(PromptInjectResult):
-    score: float
+    score: int
 
 
 class PromptInjectInputs(PromptInjectModel):
@@ -57,8 +60,10 @@ class PromptLeakModel(BaseModel):
 
 
 class PromptLeakResult(PromptLeakModel):
-    prompt: str
+    attack_name: str
+    attack_prompt: str
     answer: str
+    err: bool = False
 
 
 class PromptLeakScore(PromptLeakResult):
