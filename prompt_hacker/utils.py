@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from scipy.spatial import distance  # type: ignore
 
 
 def calc_jacaard_similarity_for_one_side(compare: str, criteria: str):
@@ -35,3 +36,7 @@ def indexing_with_nan(df: pd.DataFrame, colnames: list[Any]) -> pd.DataFrame:
     transposed_df = df.T
     transposed_df = transposed_df.reindex(colnames)
     return transposed_df.T
+
+
+def calc_hamming_similarity(s1: str, s2: str) -> float:
+    return 1 - distance.hamming(list(s1), list(s2))
