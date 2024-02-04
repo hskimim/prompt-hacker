@@ -30,3 +30,11 @@ class StringConverter(Protocol):
 
     def decode(self, encoded: str) -> str:
         ...
+
+
+class Loader(Protocol):
+    def __iter__(self) -> dict[str, str]:
+        ...
+
+    def __len__(self) -> int:
+        ...

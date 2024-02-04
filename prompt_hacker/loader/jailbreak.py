@@ -2,17 +2,34 @@ import itertools
 
 import pandas as pd
 import requests
+from typing_extensions import override
 
 from prompt_hacker import constant, utils
 from prompt_hacker.convert import Base64Convertor, Obfuscationer
+from prompt_hacker.interface import Loader
 
 
-class MaliciousPromptLoader:
+class MaliciousPromptLoader(Loader):
+    def __init__(self) -> None:
+        super().__init__()
+        self._malicious_prompt = utils.read_file_with_rel_path(
+            constant.MALICIOUS_PROMPTS_JSON_REL_PATH
+        )
+
+    @override
+    def __len__(self) -> int:
+        return len(self._malicious_prompt)
+
+    @override
+    def __iter__(self) -> dict[str, str]:
+        for data in self._malicious_prompt:
+            yield data
+
     def load(self) -> list[dict[str, str]]:
-        return utils.read_file_with_rel_path(constant.MALICIOUS_PROMPTS_JSON_REL_PATH)
+        return self._malicious_prompt
 
 
-class JailBreakChatPromptsLoader:
+class JailBreakChatPromptsLoader(Loader):
     """jailbreak prefix prompt synthetic data generator"""
 
     def __init__(self, sample_size: int | None = None) -> None:
@@ -49,11 +66,20 @@ class JailBreakChatPromptsLoader:
             for idx in range(len(df))
         ]
 
+    @override
+    def __len__(self) -> int:
+        return len(self._jailbreakchat_json)
+
+    @override
+    def __iter__(self) -> dict[str, str]:
+        for data in self._jailbreakchat_json:
+            yield data
+
     def load(self) -> list[dict[str, str]]:
         return self._jailbreakchat_json
 
 
-class JailBreakPromptsLoader:
+class JailBreakPromptsLoader(Loader):
     def __init__(
         self,
         use_jailbreakchat: bool = False,
@@ -82,11 +108,20 @@ class JailBreakPromptsLoader:
             validated_prompts.append(prompt)
         return validated_prompts
 
+    @override
+    def __len__(self) -> int:
+        return len(self._jailbreak_prompts)
+
+    @override
+    def __iter__(self) -> dict[str, str]:
+        for data in self._jailbreak_prompts:
+            yield data
+
     def load(self) -> list[dict[str, str]]:
         return self._jailbreak_prompts
 
 
-class JailBreakLoader:
+class JailBreakLoader(Loader):
     def __init__(
         self,
         use_jailbreakchat: bool = False,
@@ -100,6 +135,7 @@ class JailBreakLoader:
             ignore_error=ignore_jailbreakchat_error,
         )
 
+    @override
     def __iter__(self) -> dict[str, str]:
         for prompt, jailbreak in itertools.product(
             self._malicious_prompt_loader.load(),
@@ -116,6 +152,7 @@ class JailBreakLoader:
             )
             yield data
 
+    @override
     def __len__(self) -> int:
         return len(self._malicious_prompt_loader.load()) * len(
             self._jailbreak_prompts_loader.load()
