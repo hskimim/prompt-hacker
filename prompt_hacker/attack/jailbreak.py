@@ -58,7 +58,7 @@ class JailBreaker(Attacker):
 
                 cnt += 1
                 if inputs.sample_size:
-                    if cnt > inputs.sample_size:
+                    if cnt >= inputs.sample_size:
                         break
 
             except KeyboardInterrupt:
