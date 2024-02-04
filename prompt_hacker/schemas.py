@@ -45,12 +45,17 @@ class PromptInjectResult(PromptInjectModel):
 
 
 class PromptInjectScore(PromptInjectResult):
-    score: int
+    label: str
+    confidence: float
 
 
 class PromptInjectInputs(PromptInjectModel):
     sample_size: int = 1
     verbose: bool = True
+
+
+class PromptInjectSummary(BaseModel, arbitrary_types_allowed=True):
+    attack_summary: pd.DataFrame
 
 
 # leak
@@ -67,12 +72,17 @@ class PromptLeakResult(PromptLeakModel):
 
 
 class PromptLeakScore(PromptLeakResult):
-    score: float
+    label: str
+    confidence: float
 
 
 class PromptLeakInputs(PromptLeakModel):
     sample_size: int = 50
     verbose: bool = True
+
+
+class PromptLeakSummary(BaseModel, arbitrary_types_allowed=True):
+    attack_summary: pd.DataFrame
 
 
 # jailbreak
