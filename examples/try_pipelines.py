@@ -5,25 +5,12 @@ from dotenv import load_dotenv
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
-from prompt_hacker.attack.extract_train import (
-    TrainingDataExtractor,
-    TrainingDataExtractorEvaluator,
-)
 from prompt_hacker.attack.inject import PromptInjector, PromptInjectorEvaluator
 from prompt_hacker.attack.jailbreak import JailBreaker, JailBreakEvaluator
 from prompt_hacker.attack.leak import PromptLeaker, PromptLeakEvaluator
 from prompt_hacker.pipe import CompositePipeLine, PipeLine
-from prompt_hacker.schemas import (
-    JailBreakInputs,
-    PromptInjectInputs,
-    PromptLeakInputs,
-    TrainingExtractInputs,
-)
-from prompt_hacker.test.api_client import (
-    FewShotTestModelClient,
-    InstructedTestModelClient,
-    TestModelClient,
-)
+from prompt_hacker.schemas import JailBreakInputs, PromptInjectInputs, PromptLeakInputs
+from prompt_hacker.test.api_client import InstructedTestModelClient, TestModelClient
 
 load_dotenv(verbose=True)
 
@@ -41,12 +28,6 @@ if __name__ == "__main__":
             PipeLine(
                 attacker=JailBreaker(model=TestModelClient()),
                 evaluator=JailBreakEvaluator(),
-            ),
-            PipeLine(
-                attacker=TrainingDataExtractor(model=FewShotTestModelClient()),
-                evaluator=TrainingDataExtractorEvaluator(
-                    train_dataset=train_dataset[0],
-                ),
             ),
             PipeLine(
                 attacker=PromptInjector(
@@ -67,15 +48,11 @@ if __name__ == "__main__":
             PromptInjectInputs(),
             JailBreakInputs(),
             PromptLeakInputs(),
-            TrainingExtractInputs(
-                prefix_samples=prefix_samples,
-            ),
         ]
     )
     print(report)
 # {
 #     "jailbreak": Evaluation(score=0.09090909090909091),
-#     "extract_train": Evaluation(score=0.016272849728462362),
 #     "inject": Evaluation(score=0.8),
 #     "leak": Evaluation(score=0.38),
 # }
