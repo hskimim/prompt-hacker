@@ -1,5 +1,7 @@
+import asyncio
+
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import AsyncOpenAI, OpenAI
 from openai.types.chat import (
     ChatCompletionAssistantMessageParam,
     ChatCompletionMessageParam,
@@ -16,6 +18,7 @@ load_dotenv(verbose=True)
 class TestModelClient(ChatBaseModel):
     def __init__(self) -> None:
         self._client = OpenAI()
+        self._async_client = AsyncOpenAI()
 
     def run(self, question: str, **kwargs) -> list[str]:
         input_: list[ChatCompletionMessageParam] = [
@@ -33,6 +36,32 @@ class TestModelClient(ChatBaseModel):
             return [msg]
         else:
             raise ValueError
+
+    async def _async_call(self, question: str, **kwargs) -> list[str]:
+        input_: list[ChatCompletionMessageParam] = [
+            {"role": "user", "content": question}
+        ]
+        response = await self._async_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            temperature=0.9,
+            messages=input_,
+            **kwargs,
+        )
+
+        msg = response.choices[0].message.content
+        if isinstance(msg, str):
+            return [msg]
+        else:
+            raise ValueError
+
+    async def _async_calls(self, questions: list[str], **kwargs) -> list[list[str]]:
+        result = await asyncio.gather(
+            *[self._async_call(question, **kwargs) for question in questions]
+        )
+        return result
+
+    def async_run(self, questions: list[str], **kwargs) -> list[list[str]]:
+        return asyncio.run(self._async_calls(questions, **kwargs))
 
 
 TEST_MSG_HISTORY = [

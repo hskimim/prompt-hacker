@@ -5,6 +5,9 @@ class ChatBaseModel(Protocol):
     def run(self, question: str, **kwargs) -> list[str]:
         ...
 
+    def async_run(self, questions: list[str], **kwargs) -> list[list[str]]:
+        ...
+
 
 class EmbedBaseModel(Protocol):
     def run(self, txts: list[str], **kwargs) -> list[list[float]]:
