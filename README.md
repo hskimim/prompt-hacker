@@ -29,11 +29,36 @@ This project is dedicated to addressing the challenges of prompt hacking through
 - [X] Pipeline design that allows you to use various attackers on a single model and receive results
 - [X] Unify the return type of the evaluator to support the pipeline of attackers and evaluators.
 - [ ] Make some benchmarks using open/close model such as chatgpt, llama etc
-- [ ] Modify to send prompts (model call) asynchronously.
-    - [ ] async get_embeddings
-    - [ ] async interface's run
+- [X] Modify to send prompts (model call) asynchronously.
+    - [X] async interface's run
 
 ## Get Started
+
+### jailbreak test
+can try with
+```consoles
+poetry run python examples/try_jailbreak.py
+```
+
+```python
+from openai import OpenAI
+
+from prompt_hacker.test.api_client import TestModelClient
+from prompt_hacker.schemas import JailBreakInputs
+from prompt_hacker.attack.jailbreak import JailBreaker, JailBreakEvaluator
+
+attacker = JailBreaker(TestModelClient())
+result = attacker.run(JailBreakInputs(sample_size=50, use_async=True))
+
+evaluator = JailBreakEvaluator()
+evaluated = evaluator.evaluate(result)
+summary = evaluator.summary(evaluated)
+
+metrics = evaluator.evaluation_metric
+jailbreak_result_df = evaluator.evaluate2df(evaluated)
+
+print(summary)  # Evaluation(score=0.5)
+```
 
 ### prompt leaking
 can try with 
@@ -48,12 +73,14 @@ from prompt_hacker.schemas import PromptLeakInputs
 from prompt_hacker.pipe import PipeLine
 
 sys_prompt = "You are a skilled event planner. Please research and coordinate all the necessary details for a corporate conference happening next month."
-pipe = PipeLine(
-    attacker=PromptLeaker(model=InstructedTestModelClient(instruct=sys_prompt)),
-    evaluator=PromptLeakEvaluator(sys_prompt=sys_prompt),
-)
-report = pipe(PromptLeakInputs())
-print(report)  # score=0.3
+
+attacker = PromptLeaker(model=InstructedTestModelClient(instruct=sys_prompt))
+result = attacker.run(PromptLeakInputs())
+
+evaluator = PromptLeakEvaluator(sys_prompt=sys_prompt)
+evaluated = evaluator.evaluate(result)
+summary = evaluator.summary(evaluated)
+print(summary)  # Evaluation(score=0.8)
 ```
 
 ### prompt injection
@@ -69,34 +96,12 @@ from prompt_hacker.schemas import PromptInjectInputs
 from prompt_hacker.pipe import PipeLine
 
 sys_prompt = "You are a skilled event planner. Please research and coordinate all the necessary details for a corporate conference happening next month."
-pipe = PipeLine(
-    attacker=PromptInjector(
-        model=InstructedTestModelClient(instruct=sys_prompt)
-    ),
-    evaluator=PromptInjectorEvaluator(sys_prompt=sys_prompt),
-)
-report = pipe(PromptInjectInputs())
-print(report)  # score=0.9
-```
 
-### jailbreak test
-can try with
-```consoles
-poetry run python examples/try_jailbreak.py
-```
+attacker = PromptInjector(model=InstructedTestModelClient(instruct=sys_prompt))
+result = attacker.run(PromptInjectInputs())
 
-```python
-from openai import OpenAI
-
-from prompt_hacker.test.api_client import TestModelClient
-from prompt_hacker.schemas import JailBreakInputs
-from prompt_hacker.attack.jailbreak import JailBreaker, JailBreakEvaluator
-from prompt_hacker.pipe import PipeLine
-
-pipe = PipeLine(
-    attacker=JailBreaker(model=TestModelClient()),
-    evaluator=JailBreakEvaluator(),
-)
-report = pipe(JailBreakInputs(sample_size=10))
-print(report)  # score=0.45454545454545453
+evaluator = PromptInjectorEvaluator()
+evaluated = evaluator.evaluate(result)
+summary = evaluator.summary(evaluated)
+print(summary)  # Evaluation(score=0.14285714285714285)
 ```
