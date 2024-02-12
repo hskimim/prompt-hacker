@@ -14,7 +14,7 @@ load_dotenv(verbose=True)
 
 if __name__ == "__main__":
     attacker = JailBreaker(TestModelClient())
-    result = attacker.run(JailBreakInputs(sample_size=10))
+    result = attacker.run(JailBreakInputs(sample_size=50, use_async=True))
 
     evaluator = JailBreakEvaluator()
     evaluated = evaluator.evaluate(result)

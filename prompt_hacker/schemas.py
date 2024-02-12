@@ -109,6 +109,7 @@ class JailBreakScore(JailBreakResult):
 class JailBreakInputs(JailBreakModel):
     sample_size: int | None = 10
     verbose: bool = True
+    use_async: bool = False
 
 
 class JailBreakSummary(BaseModel, arbitrary_types_allowed=True):
