@@ -19,6 +19,8 @@ scipy = "^1.11.4"
 pandas-stubs = "^2.1.4.231227"
 types-tqdm = "^4.66.0.20240106"
 types-requests = "^2.31.0.20240106"
+nest-asyncio = "^1.6.0"
+tiktoken = "^0.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
