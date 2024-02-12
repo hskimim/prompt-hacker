@@ -3,7 +3,12 @@ import codecs
 import logging
 import random
 
+import tiktoken
+
+from prompt_hacker import constant
 from prompt_hacker.generator import CombinationBase64Decoder, DisemvowelDecoder
+from prompt_hacker.interface import StringConverter
+
 from prompt_hacker.interface import StringConverter
 
 
@@ -94,7 +99,10 @@ class LeetSpeakConverter(StringConverter):
             "y": ["j", "`/", "\\|/", "\\//"],
             "z": ["2", "7_", "-/_", "%", ">_", "~/_", r"-\_", "-|_"],
         }
-        self.encoder = {alphabet: random.choice(candidates) for alphabet, candidates in self.char_map.items()}
+        self.encoder = {
+            alphabet: random.choice(candidates)
+            for alphabet, candidates in self.char_map.items()
+        }
 
         decoder = {v: k for k, v in self.encoder.items()}
         self.sorted_decoder = dict(
@@ -127,3 +135,12 @@ class LeetSpeakConverter(StringConverter):
             return self.decode(encoded, decoded)
         else:
             return decoded
+
+
+class TikTokenTrucator:
+    def __init__(self, max_length):
+        self.max_length = max_length
+        self.enc = tiktoken.encoding_for_model(constant.MODEL_NM)
+
+    def truncate(self, text):
+        return self.enc.decode(self.enc.encode(text)[: self.max_length])
