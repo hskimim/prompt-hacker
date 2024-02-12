@@ -2,7 +2,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from prompt_hacker import constant, utils
-from prompt_hacker.generator import IsInDetector
 from prompt_hacker.interface import Attacker, ChatBaseModel, Evaluator
 from prompt_hacker.loader.inject import PromptInjectLoader
 from prompt_hacker.schemas import (
@@ -50,7 +49,6 @@ class PromptInjector(Attacker):
 class PromptInjectorEvaluator(Evaluator):
     def __init__(self) -> None:
         super().__init__()
-        self._labeler = IsInDetector()
         self._summary: PromptInjectSummary | None = None
 
     def __str__(self) -> str:
