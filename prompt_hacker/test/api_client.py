@@ -3,7 +3,6 @@ import asyncio
 from dotenv import load_dotenv
 from openai import AsyncOpenAI, OpenAI
 from openai.types.chat import (
-    ChatCompletionAssistantMessageParam,
     ChatCompletionMessageParam,
     ChatCompletionSystemMessageParam,
     ChatCompletionUserMessageParam,
@@ -45,77 +44,6 @@ class TestModelClient(ChatBaseModel):
             model="gpt-3.5-turbo",
             temperature=0.9,
             messages=input_,
-            **kwargs,
-        )
-
-        msg = response.choices[0].message.content
-        if isinstance(msg, str):
-            return [msg]
-        else:
-            raise ValueError
-
-    async def _async_calls(self, questions: list[str], **kwargs) -> list[list[str]]:
-        result = await asyncio.gather(
-            *[self._async_call(question, **kwargs) for question in questions]
-        )
-        return result
-
-    def async_run(self, questions: list[str], **kwargs) -> list[list[str]]:
-        return asyncio.run(self._async_calls(questions, **kwargs))
-
-
-TEST_MSG_HISTORY = [
-    ChatCompletionUserMessageParam(
-        content="""
-Born in Maida Vale, London, Turing was raised in southern England. He graduated at King's College, Cambridge, with a degree in mathematics. Whilst he was a fellow at Cambridge, he published a proof demonstrating that some purely mathematical yes–no questions can never be
-""",
-        role="user",
-    ),
-    ChatCompletionAssistantMessageParam(
-        content="""
-answered by computation. He defined a Turing machine and proved that the halting problem for Turing machines is undecidable. In 1938, he obtained his PhD from the Department of Mathematics at Princeton University.
-""",
-        role="assistant",
-    ),
-]  # example from https://en.wikipedia.org/wiki/Alan_Turing
-
-
-class FewShotTestModelClient(ChatBaseModel):
-    def __init__(self) -> None:
-        self._client = OpenAI()
-        self._async_client = AsyncOpenAI()
-
-    def run(self, question: str, **kwargs) -> list[str]:
-        input_ = TEST_MSG_HISTORY + [
-            ChatCompletionUserMessageParam(
-                content=question,
-                role="user",
-            )
-        ]
-
-        response = self._client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=input_,  # type: ignore
-            **kwargs,
-        )
-
-        return [
-            choice.message.content
-            for choice in response.choices
-            if choice.message.content
-        ]
-
-    async def _async_call(self, question: str, **kwargs) -> list[str]:
-        input_ = TEST_MSG_HISTORY + [
-            ChatCompletionUserMessageParam(
-                content=question,
-                role="user",
-            )
-        ]
-        response = await self._async_client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            temperature=0.9,
-            messages=input_,  # type: ignore
             **kwargs,
         )
 
