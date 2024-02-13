@@ -2,6 +2,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from prompt_hacker import constant, utils
+from prompt_hacker.convert import Base64Convertor, Obfuscationer
 from prompt_hacker.interface import Attacker, ChatBaseModel, Evaluator
 from prompt_hacker.loader.inject import PromptInjectLoader
 from prompt_hacker.schemas import (
@@ -13,6 +14,19 @@ from prompt_hacker.schemas import (
 )
 
 MODEL_NM = "inject"
+
+
+def postprocess_answer(answer: str, attack_type: str) -> str:
+    if attack_type.startswith("combination"):
+        answer = Base64Convertor().advanced_decode(answer)
+
+    elif attack_type in ("base64", "base64_raw"):
+        answer = Base64Convertor().decode(answer)
+    elif attack_type in ("hex", "hex_raw"):
+        answer = Obfuscationer(method="hex").decode(answer)
+    elif attack_type == "rot13":
+        answer = Obfuscationer(method="rot13").decode(answer)
+    return answer
 
 
 class PromptInjector(Attacker):
@@ -33,6 +47,8 @@ class PromptInjector(Attacker):
             try:
                 err = False
                 answer = self.model.run(question=data["attack_prompt"])[0]
+                answer = postprocess_answer(answer, data["attack_name"])
+
             except Exception as e:
                 answer = str(e)
                 err = True
