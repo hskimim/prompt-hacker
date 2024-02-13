@@ -113,7 +113,7 @@ class JailBreakPromptsLoader(Loader):
         return len(self._jailbreak_prompts)
 
     @override
-    def __iter__(self) -> dict[str, str]:
+    def __iter__(self) -> dict[str, str]:  # type: ignore
         for data in self._jailbreak_prompts:
             yield data
 
@@ -136,7 +136,7 @@ class JailBreakLoader(Loader):
         )
 
     @override
-    def __iter__(self) -> dict[str, str]:
+    def __iter__(self) -> dict[str, str]:  # type: ignore
         for prompt, jailbreak in itertools.product(
             self._malicious_prompt_loader.load(),
             self._jailbreak_prompts_loader.load(),
@@ -149,6 +149,7 @@ class JailBreakLoader(Loader):
                 ROT13=Obfuscationer(method="rot13").encode(query),
                 LEETSPEAK=Obfuscationer(method="leetspeak").encode(query),
                 DISEMVOWEL=Obfuscationer(method="disemvowel").encode(query),
+                HEX=Obfuscationer(method="hex").encode(query),
             )
             yield data
 

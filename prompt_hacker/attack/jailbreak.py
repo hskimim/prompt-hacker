@@ -23,7 +23,8 @@ def postprocess_answer(answer: str, attack_type: str) -> str:
 
     elif attack_type in ("base64", "base64_raw"):
         answer = Base64Convertor().decode(answer)
-
+    elif attack_type in ("hex", "hex_raw"):
+        answer = Obfuscationer(method="hex").decode(answer)
     elif attack_type == "rot13":
         answer = Obfuscationer(method="rot13").decode(answer)
     return answer

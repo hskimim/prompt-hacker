@@ -4,11 +4,10 @@ import logging
 import random
 
 import tiktoken
+from cryptography.fernet import Fernet
 
 from prompt_hacker import constant
 from prompt_hacker.generator import CombinationBase64Decoder, DisemvowelDecoder
-from prompt_hacker.interface import StringConverter
-
 from prompt_hacker.interface import StringConverter
 
 
@@ -33,11 +32,16 @@ class Obfuscationer:
                 obfuscater = Rot13Converter()
             case "disemvowel":
                 obfuscater = DisemvowelConverter()
+            case "hex":
+                obfuscater = HexConverter()
             case _:
                 raise ValueError(
                     "invalid method, choose between {'leetspeak', 'rot13', 'disemvowel'}",
                 )
         self.obfuscater = obfuscater
+
+    def models(self) -> list[str]:
+        return ["leetspeak", "rot13", "disemvowel", "hex"]
 
     def encode(self, string: str) -> str:
         return self.obfuscater.encode(string)
@@ -137,6 +141,18 @@ class LeetSpeakConverter(StringConverter):
             return decoded
 
 
+class FermetConverter(StringConverter):
+    def __init__(self) -> None:
+        super().__init__()
+        self.cipher_suite = Fernet(constant.FERMET_KEY)
+
+    def encode(self, string: str) -> str:
+        return self.cipher_suite.encrypt(string.encode("utf-8")).decode("utf-8")
+
+    def decode(self, encoded: str) -> str:
+        return self.cipher_suite.decrypt(encoded.encode("utf-8")).decode("utf-8")
+
+
 class TikTokenTrucator:
     def __init__(self, max_length):
         self.max_length = max_length
@@ -144,3 +160,12 @@ class TikTokenTrucator:
 
     def truncate(self, text):
         return self.enc.decode(self.enc.encode(text)[: self.max_length])
+        return self.enc.decode(self.enc.encode(text)[: self.max_length])
+
+
+class HexConverter:
+    def encode(self, txt):
+        return txt.encode().hex()
+
+    def decode(self, txt):
+        return bytes.fromhex(txt).decode("utf-8")
