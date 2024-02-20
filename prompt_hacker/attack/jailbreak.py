@@ -56,15 +56,16 @@ class JailBreaker(Attacker):
             else self._loader
         ):
             try:
-                answer = self._model.run(data["question"])[0]
-                answer = postprocess_answer(answer, data["attack_name"])
+                for _ in range(inputs.repeat_nums):
+                    answer = self._model.run(data["question"])[0]
+                    answer = postprocess_answer(answer, data["attack_name"])
 
-                result.append(
-                    JailBreakResult(
-                        **data,
-                        answer=answer,
+                    result.append(
+                        JailBreakResult(
+                            **data,
+                            answer=answer,
+                        )
                     )
-                )
 
                 cnt += 1
                 if inputs.sample_size:
@@ -88,9 +89,11 @@ class JailBreaker(Attacker):
     def _async_run(self, inputs: JailBreakInputs) -> list[JailBreakResult]:
         result = []
         cnt = 0
-
+        questions: list[str] = [data["question"] for data in self._loader][  # type:ignore
+            : inputs.sample_size
+        ]
         answers = self._model.async_run(
-            [data["question"] for data in self._loader][: inputs.sample_size]  # type:ignore
+            [question for question in questions for _ in range(inputs.repeat_nums)]
         )
 
         for data, answer in zip(self._loader, answers):  # type:ignore

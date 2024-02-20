@@ -33,7 +33,7 @@ if __name__ == "__main__":
                 attacker=PromptInjector(
                     model=InstructedTestModelClient(instruct=sys_prompt)
                 ),
-                evaluator=PromptInjectorEvaluator(sys_prompt=sys_prompt),
+                evaluator=PromptInjectorEvaluator(),
             ),
             PipeLine(
                 attacker=PromptLeaker(

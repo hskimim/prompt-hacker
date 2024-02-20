@@ -9,27 +9,6 @@ class Evaluation(BaseModel):
     score: float
 
 
-# extract_train
-class TrainingDataExtractModel(BaseModel):
-    def __str__(self) -> str:
-        return "extract_train"
-
-
-class TrainingDataExtractResult(TrainingDataExtractModel):
-    prefix_prompt: str
-    suffix_prompt: str
-
-
-class TrainingExtractScore(TrainingDataExtractResult):
-    score: float
-
-
-class TrainingExtractInputs(TrainingDataExtractModel):
-    prefix_samples: list[str]
-    sample_size: int = 50
-    verbose: bool = True
-
-
 # inject
 class PromptInjectModel(BaseModel):
     def __str__(self) -> str:
@@ -50,8 +29,8 @@ class PromptInjectScore(PromptInjectResult):
 
 
 class PromptInjectInputs(PromptInjectModel):
-    sample_size: int = 1
     verbose: bool = True
+    use_async: bool = False
 
 
 class PromptInjectSummary(BaseModel, arbitrary_types_allowed=True):
@@ -77,8 +56,8 @@ class PromptLeakScore(PromptLeakResult):
 
 
 class PromptLeakInputs(PromptLeakModel):
-    sample_size: int = 50
     verbose: bool = True
+    use_async: bool = False
 
 
 class PromptLeakSummary(BaseModel, arbitrary_types_allowed=True):
@@ -107,7 +86,8 @@ class JailBreakScore(JailBreakResult):
 
 
 class JailBreakInputs(JailBreakModel):
-    sample_size: int | None = 10
+    sample_size: int | None
+    repeat_nums: int = 5
     verbose: bool = True
     use_async: bool = False
 
@@ -122,5 +102,4 @@ AttackerInputs = Union[
     JailBreakInputs,
     PromptLeakInputs,
     PromptInjectInputs,
-    TrainingExtractInputs,
 ]
