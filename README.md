@@ -15,15 +15,19 @@ This project is dedicated to addressing the challenges of prompt hacking through
 ### prompt leaking
 - [X] Try prompt leaking by creating multiple prompts using TemperatureDecaySampling.
 - [X] Evaluate whether prompt leaking was successful
+- [ ] Try multiple times to sample prompt since LLM used to make result under stochastic term
+
 ### prompt injection
 - [X] Inject arbitrary system prompts through the SystemPromptGenerator
 - [X] Evaluate whether prompt injection was successful
+- [ ] Try multiple times to sample prompt since LLM used to make result under stochastic term
 
 ### jailbreak
 - [X] Generation of synthetic data for malicious prompts
 - [X] Develop the evaluator to analyze which prompts/questions most frequently result in jailbreaks.
 - [ ] Generation of synthetic data for jailbreak prompts
-
+- [ ] Try multiple times to sample prompt since LLM used to make result under stochastic term
+  
 ### others
 - [X] Create an interface that makes it easier for arbitrary chatbots to be integrated.
 - [X] Pipeline design that allows you to use various attackers on a single model and receive results
@@ -31,6 +35,8 @@ This project is dedicated to addressing the challenges of prompt hacking through
 - [ ] Make some benchmarks using open/close model such as chatgpt, llama etc
 - [X] Modify to send prompts (model call) asynchronously.
     - [X] async interface's run
+    - [ ] unify async interface with sync
+- [ ] Make understandable CLI during progress
 
 ## Get Started
 
